@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAINTENANCE - Neo Party</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #020b0a;
+            --primary-glow: #00e5f4;
+            --accent-gold: #ffcc33;
+            --glass-white: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Animasi */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, #0b5250 0%, transparent 60%);
+            opacity: 0.3;
+            animation: pulse 8s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.2); opacity: 0.4; }
+        }
+
+        /* Card Container */
+        .maintenance-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 50px 30px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .gear-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .fa-cog {
+            font-size: 70px;
+            color: var(--primary-glow);
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Typography HD */
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.8rem; /* Ukuran Besar */
+            line-height: 1;
+            margin-bottom: 5px;
+            color: var(--accent-gold);
+            text-shadow: 0 0 20px rgba(255, 204, 51, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .sub-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+        }
+
+        .highlight-text {
+            color: #fff;
+            font-weight: 700;
+            display: block;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* Button WhatsApp */
+        .btn-wa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 20px 35px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-wa::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .btn-wa:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.5);
+        }
+
+        /* Footer */
+        .footer-info {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 2.2rem; }
+            .sub-title { font-size: 1.4rem; }
+            p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="maintenance-card">
+        <div class="gear-container">
+            <i class="fas fa-cog"></i>
+        </div>
+
+        <h1 class="main-title">MAINTENANCE</h1>
+        <h2 class="sub-title">MOHON MAAF</h2>
+        
+        <p>
+            Sistem otomatis sedang dalam pembaharuan untuk meningkatkan layanan kami.
+            <span class="highlight-text">Bongkar manual silahkan hubungi admin WA</span>
+        </p>
+
+        <a href="https://wa.me/6289509170352?text=Halo%20Admin,%20saya%20ingin%20bongkar%20koin%20secara%20manual." class="btn-wa">
+            <i class="fab fa-whatsapp"></i> CHAT ADMIN SEKARANG
+        </a>
+
+        <div class="footer-info">
+            &copy; 2026 Neo party
+        </div>
+    </div>
+
+</body>
+</html>
