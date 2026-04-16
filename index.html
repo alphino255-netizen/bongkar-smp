@@ -62,9 +62,8 @@
             text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
         }
 
-        /* --- STYLE LOGO HD --- */
         .logo-mid {
-            width: 80px; /* Sesuaikan ukuran logo */
+            width: 80px;
             height: auto;
             margin: 10px auto 20px;
             display: block;
@@ -138,15 +137,89 @@
             box-shadow: 0 15px 30px rgba(255, 136, 0, 0.5);
         }
 
+        /* --- TESTIMONI SECTION --- */
         .testi-container { padding: 30px 25px; }
         .testi-title { display: flex; align-items: center; gap: 12px; color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; }
         .testi-title i { color: #a33eb3; font-size: 1.4rem; }
+        
+        /* Form Input Komentar */
+        .add-review-section { margin-bottom: 25px; }
+        .review-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .review-input-group input, 
+        .review-input-group textarea {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
+        .btn-send-review {
+            background: var(--neon-blue);
+            color: #1a2235;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-send-review:hover { filter: brightness(1.2); }
+
+        /* Review Cards */
         .review-card { background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.03); }
         .review-user { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .player-name { color: var(--neon-blue); font-weight: 700; font-size: 1rem; }
         .stars { color: #ffcc33; font-size: 0.8rem; }
         .review-text { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; }
         .time-info { border-top: 2px solid var(--wa-green); padding-top: 8px; color: var(--wa-green); font-size: 0.75rem; font-weight: 800; }
+
+        /* Modal Notifikasi */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #1a2235;
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 350px;
+            border: 2px solid var(--neon-blue);
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-content i { font-size: 3.5rem; color: #ffcc33; margin-bottom: 15px; }
+        .modal-content p { color: white; font-weight: 600; line-height: 1.6; font-size: 1rem; }
+        .btn-close-modal {
+            margin-top: 25px;
+            background: var(--neon-blue);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #1a2235;
+        }
     </style>
 </head>
 <body>
@@ -180,65 +253,57 @@
             <div class="testi-title">
                 <i class="fas fa-comments"></i> Ulasan Pembeli
             </div>
+
+            <div class="add-review-section">
+                <div class="review-input-group">
+                    <input type="text" id="rev-name" placeholder="Nama...">
+                    <textarea id="rev-text" placeholder="Tulis ulasan anda..." rows="2"></textarea>
+                    <button class="btn-send-review" onclick="showNotice()">KIRIM ULASAN</button>
+                </div>
+            </div>
+
             <div id="review-list"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalNotice">
+        <div class="modal-content">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Anda hanya bisa berkomentar jika sudah melakukan withdraw koin melalui Admin.</p>
+            <button class="btn-close-modal" onclick="closeNotice()">SAYA MENGERTI</button>
         </div>
     </div>
 
     <script>
         const players = [
-    "ahmad",
-    "player_2448011",
-    "PejuangB",
-    "kings",
-    "Player_1895",
-    "suprilopez",
-    "RizkyGamer",
-    "noobMaster77",
-    "andika_01",
-    "shadowX",
-    "ZakyPro",
-    "hunter_998",
-    "legendaryID",
-    "FajarXGaming",
-    "dark_knight21",
-    "bagasplay",
-    "indra_777",
-    "sultanboss",
-    "rehanProID",
-    "ghostplayer99"
-];
+            "ahmad", "player_2448011", "PejuangB", "kings", "Player_1895",
+            "suprilopez", "RizkyGamer", "noobMaster77", "andika_01", "shadowX",
+            "ZakyPro", "hunter_998", "legendaryID", "FajarXGaming", "dark_knight21",
+            "bagasplay", "indra_777", "sultanboss", "rehanProID", "ghostplayer99"
+        ];
+        
         const texts = [
-    "Adminnya ramah kalau ada kendala langsung dibantu.",
-    "Udah bongkar berkali-kali selalu amanah. Jozzz.",
-    "Bongkar 50b amanah bosku.",
-    "Bongkar di sini emang paling kilat, dana langsung di proses!",
-    "Terjamin amanah, dana langsung cair hitungan menit.",
-    "Bongkar 100b done amanah bosku.",
-    "Pelayanan cepat dan responsif, mantap banget.",
-    "Baru coba dan gacor, prosesnya cepat.",
-    "Admin standby terus, jadi enak kalau butuh bantuan.",
-    "Proses tanpa ribet, langsung gas cair.",
-    "Trusted banget, udah langganan di sini.",
-    "Bongkar besar pun tetap aman dan lancar.",
-    "Cepet banget prosesnya, gak pake nunggu lama.",
-    "Mantap jiwa, baru kirim langsung diproses.",
-    "Amanah pol, recommended buat semua.",
-    "Gak pernah zonk, selalu lancar tiap transaksi.",
-    "Admin gercep, pelayanan top banget.",
-    "Sudah berkali-kali pakai, tetap aman.",
-    "Dana masuk cepat, gak pake drama.",
-    "Proses transparan dan jelas, bikin tenang.",
-    "Pelayanan ramah dan profesional.",
-    "Bongkar di sini selalu jadi pilihan utama.",
-    "Gak nyesel pakai layanan ini, mantap.",
-    "Top markotop, proses cepat dan aman.",
-    "Langsung cair tanpa kendala, mantul.",
-    "Udah coba di tempat lain, tetap paling enak di sini.",
-    "Admin fast respon, jadi makin percaya.",
-    "Transaksi aman, hasil memuaskan.",
-    "Gak pake lama, langsung beres.",
-    "Sangat direkomendasikan buat yang butuh cepat."
-];
+            "Adminnya ramah kalau ada kendala langsung dibantu.",
+            "Udah bongkar berkali-kali selalu amanah. Jozzz.",
+            "Bongkar 50b amanah bosku.",
+            "Bongkar di sini emang paling kilat, dana langsung di proses!",
+            "Terjamin amanah, dana langsung cair hitungan menit.",
+            "Bongkar 100b done amanah bosku.",
+            "Pelayanan cepat dan responsif, mantap banget.",
+            "Baru coba dan gacor, prosesnya cepat.",
+            "Admin standby terus, jadi enak kalau butuh bantuan.",
+            "Proses tanpa ribet, langsung gas cair.",
+            "Trusted banget, udah langganan di sini.",
+            "Bongkar besar pun tetap aman dan lancar.",
+            "Cepet banget prosesnya, gak pake nunggu lama.",
+            "Mantap jiwa, baru kirim langsung diproses.",
+            "Amanah pol, recommended buat semua.",
+            "Gak pernah zonk, selalu lancar tiap transaksi.",
+            "Admin gercep, pelayanan top banget.",
+            "Sudah berkali-kali pakai, tetap aman.",
+            "Dana masuk cepat, gak pake drama.",
+            "Proses transparan dan jelas, bikin tenang."
+        ];
 
         const list = document.getElementById('review-list');
 
@@ -247,28 +312,47 @@
         }
 
         function getRandomStars() {
-    const starCount = Math.floor(Math.random() * 2) + 4; // 4 atau 5
-    return "★".repeat(starCount) + "☆".repeat(5 - starCount);
-}
+            const starCount = Math.floor(Math.random() * 2) + 4; // 4 atau 5
+            return "★".repeat(starCount) + "☆".repeat(5 - starCount);
+        }
 
-        // Loop untuk membuat 5 ulasan acak
+        // Loop untuk membuat 5 ulasan acak awal
         for (let i = 0; i < 5; i++) {
-    const randomPlayer = getRandom(players);
-    const randomText = getRandom(texts);
-    const randomTime = Math.floor(Math.random() * 58) + 1;
+            const randomPlayer = getRandom(players);
+            const randomText = getRandom(texts);
+            const randomTime = Math.floor(Math.random() * 58) + 1;
 
-    const card = document.createElement('div');
-    card.className = 'review-card';
-    card.innerHTML = `
-        <div class="review-user">
-            <span class="player-name">${randomPlayer}</span>
-            <span class="stars">${getRandomStars()}</span>
-        </div>
-        <p class="review-text">"${randomText}"</p>
-        <div class="time-info">${randomTime} Menit yang lalu</div>
-    `;
-    list.appendChild(card);
-}
+            const card = document.createElement('div');
+            card.className = 'review-card';
+            card.innerHTML = `
+                <div class="review-user">
+                    <span class="player-name">${randomPlayer}</span>
+                    <span class="stars">${getRandomStars()}</span>
+                </div>
+                <p class="review-text">"${randomText}"</p>
+                <div class="time-info">${randomTime} Menit yang lalu</div>
+            `;
+            list.appendChild(card);
+        }
+
+        // Fungsi Notifikasi
+        function showNotice() {
+            const name = document.getElementById('rev-name').value;
+            const text = document.getElementById('rev-text').value;
+
+            if(name.trim() === "" || text.trim() === "") {
+                alert("Silahkan isi nama dan ulasan.");
+                return;
+            }
+
+            document.getElementById('modalNotice').style.display = 'flex';
+        }
+
+        function closeNotice() {
+            document.getElementById('modalNotice').style.display = 'none';
+            document.getElementById('rev-name').value = "";
+            document.getElementById('rev-text').value = "";
+        }
     </script>
 </body>
 </html>
