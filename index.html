@@ -142,7 +142,6 @@
         .testi-title { display: flex; align-items: center; gap: 12px; color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; }
         .testi-title i { color: #a33eb3; font-size: 1.4rem; }
         
-        /* Form Input Komentar */
         .add-review-section { margin-bottom: 25px; }
         .review-input-group {
             display: flex;
@@ -175,7 +174,6 @@
         }
         .btn-send-review:hover { filter: brightness(1.2); }
 
-        /* Review Cards */
         .review-card { background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.03); }
         .review-user { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .player-name { color: var(--neon-blue); font-weight: 700; font-size: 1rem; }
@@ -183,7 +181,6 @@
         .review-text { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; }
         .time-info { border-top: 2px solid var(--wa-green); padding-top: 8px; color: var(--wa-green); font-size: 0.75rem; font-weight: 800; }
 
-        /* Modal Notifikasi */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -219,6 +216,60 @@
             font-weight: 800;
             cursor: pointer;
             color: #1a2235;
+        }
+
+        /* --- STYLE TOAST NOTIFIKASI --- */
+        .toast-notif {
+            background: rgba(20, 25, 35, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateX(-120%);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: 'Quicksand', sans-serif;
+            min-width: 260px;
+        }
+
+        .toast-notif.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            background: #10b981;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .toast-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toast-user {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .toast-status {
+            color: #10b981;
+            margin-left: 5px;
+        }
+
+        .toast-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
@@ -266,6 +317,8 @@
         </div>
     </div>
 
+    <div id="toast-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 10000; pointer-events: none;"></div>
+
     <div class="modal-overlay" id="modalNotice">
         <div class="modal-content">
             <i class="fas fa-exclamation-circle"></i>
@@ -312,11 +365,10 @@
         }
 
         function getRandomStars() {
-            const starCount = Math.floor(Math.random() * 2) + 4; // 4 atau 5
+            const starCount = Math.floor(Math.random() * 2) + 4;
             return "★".repeat(starCount) + "☆".repeat(5 - starCount);
         }
 
-        // Loop untuk membuat 5 ulasan acak awal
         for (let i = 0; i < 5; i++) {
             const randomPlayer = getRandom(players);
             const randomText = getRandom(texts);
@@ -335,16 +387,13 @@
             list.appendChild(card);
         }
 
-        // Fungsi Notifikasi
         function showNotice() {
             const name = document.getElementById('rev-name').value;
             const text = document.getElementById('rev-text').value;
-
             if(name.trim() === "" || text.trim() === "") {
                 alert("Silahkan isi nama dan ulasan.");
                 return;
             }
-
             document.getElementById('modalNotice').style.display = 'flex';
         }
 
@@ -353,6 +402,51 @@
             document.getElementById('rev-name').value = "";
             document.getElementById('rev-text').value = "";
         }
+
+        /* --- LOGIKA TOAST TRANSAKSI --- */
+        const toastContainer = document.getElementById('toast-container');
+
+        function createTransactionToast() {
+            // DAFTAR HARGA ACAK (Silakan tambahkan atau ubah di sini)
+            const listHarga = ["62.000", "310.000", "620.000", "3.100.000", "6.200.000", "930.000", "114.000"];
+            const paymentMethods = ["Dana", "OVO", "GoPay", "ShopeePay", "Seabank", "Transfer Bank"];
+            
+            const randomPlayer = getRandom(players); // Ambil dari daftar nama player
+            const randomMethod = getRandom(paymentMethods);
+            const randomAmount = getRandom(listHarga); // Ambil dari daftar harga di atas
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notif';
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas fa-check"></i></div>
+                <div class="toast-content">
+                    <div class="toast-user">${randomPlayer} <span class="toast-status">Bongkar Selesai</span></div>
+                    <div class="toast-desc">${randomMethod} - 🇮🇩 Rp ${randomAmount}</div>
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        function loopNotif() {
+            const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000;
+            setTimeout(() => {
+                createTransactionToast();
+                loopNotif();
+            }, delay);
+        }
+
+        setTimeout(() => {
+            createTransactionToast();
+            loopNotif(); // Mulai perulangan setelah notif pertama muncul
+        }, 1500);
     </script>
 </body>
 </html>
