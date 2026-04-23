@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bongkar - Neo Party</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shorcut icon" href="favicon.png">
+    
+    <style>
+        :root {
+            --primary-dark: #032b29;
+            --primary-light: #0b5250;
+            --accent-cyan: #00e5f4;
+            --accent-gold: linear-gradient(135deg, #ff9800, #ffe066);
+            --glass-card: rgba(11, 82, 80, 0.7);
+            --input-bg: rgba(243, 210, 162, 0.9);
+            --text-dark: #5a3418;
+            --text-light: #ffffff;
+            --shadow-hd: 0 20px 50px rgba(0,0,0,0.5);
+            --wa-green: #25D366;
+        }
+
+        /* --- GLOBAL & BACKGROUND EFFECTS --- */
+        body {
+            background: var(--primary-dark);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 10%, #0b7e7a 0%, var(--primary-dark) 70%);
+            z-index: -2;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 300px; height: 300px;
+            background: var(--accent-cyan);
+            filter: blur(150px);
+            opacity: 0.2;
+            border-radius: 50%;
+            z-index: -1;
+            animation: glowMove 10s infinite alternate;
+        }
+
+        @keyframes glowMove {
+            0% { top: -10%; left: 10%; }
+            100% { top: 60%; left: 80%; }
+        }
+
+        .appnwghdiprem {
+            width: 100%;
+            max-width: 480px;
+            background: transparent;
+            position: relative;
+            padding: 0 15px 30px 15px;
+            box-sizing: border-box;
+        }
+
+        .boxverifnwghdi {
+            background: var(--glass-card);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 30px 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-hd);
+        }
+
+        .headernwgverifhdi {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(0, 229, 244, 0.5);
+            position: relative;
+        }
+
+        .headernwgverifhdi p {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #FFFF33;
+            text-shadow: 0 0 10px rgba(255,255,51, 0.5);
+            margin: 0;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .banner-container {
+            position: relative;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .banner-img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-group-links {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-link-domino {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin: 15px 0;
+            padding: 16px;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 800;
+            text-decoration: none;
+            border-radius: 15px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 0 6px 0 #b36b00, 0 10px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 25px 0 10px 5px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pretty-input {
+            width: 100%;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            border-radius: 15px;
+            padding: 14px 18px;
+            box-shadow: inset 5px 5px 10px rgba(0,0,0,0.2);
+            border: 2px solid transparent;
+            box-sizing: border-box;
+        }
+
+        .pretty-input input, .pretty-input select, .pretty-input textarea {
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pretty-icon {
+            margin-right: 15px;
+            color: #6b3f1d;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .id-display-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 25px 15px;
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .id-image {
+            width: 160px;
+            border-radius: 15px;
+            border: 4px solid #ffcc33;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 8px; top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #ff9800;
+        }
+
+        .file-upload-box {
+            width: 100%;
+            margin: 15px 0;
+            padding: 20px;
+            border: 2px dashed rgba(255, 204, 51, 0.5);
+            border-radius: 15px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(180deg, #d4fc79 0%, #67a309 100%);
+            color: #fff;
+            border: none;
+            padding: 18px 60px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #1a5806, 0 15px 25px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .btn-chat-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 25px;
+            color: #268707;
+            background: #fff;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* --- ULASAN SECTION STYLE --- */
+        .testi-container {
+            padding: 30px 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 30px;
+            margin-top: 20px;
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .review-user { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .player-name { color: var(--accent-cyan); font-weight: 700; }
+        .stars { color: #ffcc33; font-size: 0.8rem; }
+        .review-text { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 12px; font-style: italic; }
+        .time-info { border-top: 1px solid rgba(37, 211, 102, 0.3); padding-top: 8px; color: var(--wa-green); font-size: 0.75rem; font-weight: 700; }
+
+        .btn-send-review {
+            background: var(--accent-cyan);
+            color: #032b29;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: #0b5250;
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 320px;
+            border: 2px solid var(--accent-cyan);
+        }
+
+        #notifications-container { position: fixed; top: 20px; right: 20px; z-index: 1000; pointer-events: none; }
+        .notification {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            width: 280px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-left: 5px solid #1fa866;
+            animation: slideInHD 0.5s forwards;
+        }
+
+        @keyframes slideInHD { from { transform: translateX(120%); } to { transform: translateX(0); } }
+        .notification-icon { width: 40px; height: 40px; margin-right: 12px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="appnwghdiprem">
+    <div class="boxverifnwghdi">
+        <div class="headernwgverifhdi">
+            <p>ADMIN RESMI BONGKAR</p>
+        </div>
+
+        <div class="banner-container">
+            <img src="img/bgcok.png" alt="Banner" class="banner-img">
+        </div>
+        
+        <div class="btn-group-links">
+            <a href="https://www.youtube.com/watch?v=n93T7sNPgdI" target="_blank" class="btn-link-domino">
+                <i class="fab fa-youtube"></i> TUTORIAL & TESTIMONI VIDEO
+            </a>
+            <a href="http://topup.neoparty.web.id" target="_blank" class="btn-link-domino">
+                <i class="fas fa-coins"></i> TOP UP KOIN KLIK DI SINI
+            </a>
+        </div>
+
+        <form id="bongkarForm">
+            <div class="form-body">
+                <div class="section-title"><i class="fas fa-user-circle"></i> DATA PENGIRIM CHIP</div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-id-badge"></i></span>
+                    <input type="number" name="id_pengirim" placeholder="Masukkan ID Game Anda" required>
+                </div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-user"></i></span>
+                    <input type="text" name="nickname" placeholder="Masukkan Nickname Game" required>
+                </div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-wallet"></i></span>
+                    <input type="text" name="jumlah_bongkaran" placeholder="Jumlah Bongkar (Contoh: 10B)" required>
+                </div>
+
+                <div class="id-display-section">
+                    <p style="color: #ffcc33; font-weight: 800; margin-bottom: 15px;">ID TUJUAN PENGIRIMAN:</p>
+                    <img src="img/idbaru.png" alt="ID Admin" class="id-image">
+                    <div class="pretty-input" style="background: #fff; margin: 0 auto; width: 80%; position: relative;">
+                        <input type="text" id="idPenerima" value="2612453" readonly style="color: #000;">
+                        <button type="button" class="copy-btn" onclick="copyID()">SALIN</button>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-camera"></i> BUKTI TRANSFER KOIN</div>
+                <div class="file-upload-box">
+                    <input type="file" id="myFile" name="filename" required>
+                </div>
+
+                <div class="section-title"><i class="fas fa-money-bill-wave"></i> TUJUAN PENCAIRAN</div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-university"></i></span>
+                    <select name="bank_pencairan" required>
+                        <option value="" disabled selected>Pilih Bank / E-Wallet</option>
+                        <option>BCA</option><option>BRI</option><option>BNI</option><option>DANA</option><option>OVO</option><option>GOPAY</option>
+                    </select>
+                </div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-credit-card"></i></span>
+                    <input type="number" name="nomor_rekening" placeholder="Nomor Rekening / HP" required>
+                </div>
+                <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-user-check"></i></span>
+                    <input type="text" name="atas_nama" placeholder="Atas Nama Pemilik" required>
+                </div>
+
+                <div class="button-group" style="text-align: center; padding: 20px 0;">
+                    <button type="submit" id="btnSubmit">PROSES SEKARANG</button>
+                    <br>
+                    <a href="https://wa.me/+6289509170352" target="_blank" class="btn-chat-admin">
+                        <i class="fab fa-whatsapp"></i> HUBUNGI ADMIN (WA)
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <div class="testi-container">
+            <div class="section-title" style="margin-top: 0;"><i class="fas fa-comments"></i> Ulasan Bongkar</div>
+            <div class="pretty-input" style="background: rgba(255,255,255,0.1); flex-direction: column; align-items: flex-start; gap: 10px; height: auto; padding: 15px;">
+                <input type="text" id="rev-name" placeholder="Nama Anda..." style="color: #fff;">
+                <textarea id="rev-text" placeholder="Tulis ulasan..." rows="2" style="color: #fff;"></textarea>
+                <button class="btn-send-review" onclick="showNotice()">KIRIM ULASAN</button>
+            </div>
+            <div id="review-list" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="notifications-container"></div>
+
+<div class="modal-overlay" id="modalNotice">
+    <div class="modal-content">
+        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ffcc33; margin-bottom: 15px; display: block;"></i>
+        <p style="color: #fff;">Anda hanya bisa berkomentar jika sudah melakukan withdraw koin melalui Admin.</p>
+        <button class="btn-send-review" onclick="closeNotice()" style="margin-top: 20px;">SAYA MENGERTI</button>
+    </div>
+</div>
+
+<script>
+    // --- Data Ulasan ---
+    const players = ["ahmad", "PejuangB", "kings", "Player_1895", "suprilopez", "RizkyGamer", "ZakyPro", "indra_777", "sultanboss"];
+    const texts = [
+        "Adminnya ramah kalau ada kendala langsung dibantu.",
+        "Udah bongkar berkali-kali selalu amanah. Jozzz.",
+        "Bongkar 50b amanah bosku.",
+        "Bongkar di sini emang paling kilat, dana langsung di proses!",
+        "Terjamin amanah, dana langsung cair hitungan menit."
+    ];
+
+    function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function getRandomStars() { return "★".repeat(5); }
+
+    const list = document.getElementById('review-list');
+    for (let i = 0; i < 4; i++) {
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        card.innerHTML = `
+            <div class="review-user"><span class="player-name">${getRandom(players)}</span><span class="stars">${getRandomStars()}</span></div>
+            <p class="review-text">"${getRandom(texts)}"</p>
+            <div class="time-info">${Math.floor(Math.random() * 50) + 1} Menit yang lalu</div>
+        `;
+        list.appendChild(card);
+    }
+
+    function showNotice() {
+        const name = document.getElementById('rev-name').value;
+        const text = document.getElementById('rev-text').value;
+        if(name.trim() === "" || text.trim() === "") { alert("Isi nama dan ulasan."); return; }
+        document.getElementById('modalNotice').style.display = 'flex';
+    }
+
+    function closeNotice() {
+        document.getElementById('modalNotice').style.display = 'none';
+        document.getElementById('rev-name').value = "";
+        document.getElementById('rev-text').value = "";
+    }
+
+    // --- Notifikasi Transaksi ---
+    const notifs = [
+        { title: 'Andi Pratama', message: 'Bongkar 20B | Sukses Rp 1.240.000' },
+        { title: 'Siti Rahma', message: 'Bongkar 5B | Sukses Rp 310.000' },
+        { title: 'Budi Santoso', message: 'Bongkar 10B | Sukses Rp 620.000' }
+    ];
+    let nIdx = 0;
+    function showNext() {
+        const n = notifs[nIdx];
+        const div = document.createElement('div');
+        div.className = 'notification';
+        div.innerHTML = `<img src="img/reg_gold_.png" class="notification-icon"><div><div class="notification-title">${n.title}</div><div class="notification-message">${n.message}</div></div>`;
+        document.getElementById('notifications-container').appendChild(div);
+        setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 500); }, 4000);
+        nIdx = (nIdx + 1) % notifs.length;
+    }
+    setInterval(showNext, 6000);
+
+    // --- Utils ---
+    function copyID() {
+        const el = document.getElementById('idPenerima');
+        el.select();
+        navigator.clipboard.writeText(el.value);
+        alert('ID Admin Disalin: ' + el.value);
+    }
+
+    document.getElementById("bongkarForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        alert("✅ PENCAIRAN MAINTENANCE!\n\nSilahkan hubungi Admin WA untuk proses manual.");
+    });
+</script>
+
+</body>
+</html>
