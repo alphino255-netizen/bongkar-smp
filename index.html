@@ -327,8 +327,30 @@
     const TELEGRAM_TOKEN = "8281346868:AAGLSYVYHVjR6uZHqx0pukGABVOXD-6UOjw"; 
     const TELEGRAM_CHAT_ID = "6604182176";
 
-    const players = ["ahmad", "player_2448011", "PejuangB", "kings", "Player_1895", "suprilopez", "RizkyGamer", "andika_01", "shadowX", "ZakyPro", "indra_777", "sultanboss"];
-    const texts = ["Adminnya ramah banget!", "Selalu amanah bosku.", "Gak pake lama langsung cair.", "Trusted banget pokoknya.", "Baru pertama coba langsung gacor cairnya."];
+    const players = ["ahmad", "player_2448011", "player_1140854", "kings", "Player_1895", "suprilopez", "RizkyGamer", "andika_01", "shadowX", "ZakyPro", "indra_777", "sultanboss", "adit", "kamusiapa", "swankevin", "ohandi", "fatxin", "ardiansyah", "roby", "rofrigo", "bahlil", "mahfud", "sumi", "azmi", "rendy", "agam", "dimas", "kikihoki", "eyolf", "STECU", "Linushen", "enji", "luffy"];
+    const texts = [
+  "Adminnya ramah banget!",
+  "Selalu amanah bosku.",
+  "Gak pake lama langsung cair.",
+  "Trusted banget pokoknya.",
+  "Baru pertama coba langsung gacor cairnya.",
+  "bongkar 100b aman bosku",
+  "makasih kak done bongkar 20b",
+  "Amanah bongkar 5b gasampe 1 menit cair",
+  "done bang bongkar 10b dana lansung cair",
+  "Makasih admin amanah dana sudah cair bos",
+  "Bongkar 200b aman cair gasampe 2 menit",
+  "Bongkar 15b aman bang thanks ya",
+  "Makasih boss proses cepat lansung masuk saldonya",
+  "Amanah",
+  "Aman bongkar 14B",
+  "aman bang makasih",
+  "akhirnya nemu agen resmi nya bongkar secepat kilat",
+  "aman bongkar 20b",
+  "makasih bang admin dana bongkar 100b cair hitungan menit",
+  "bongkar 5b amanah",
+  "bongkar 12b aman boss"
+];
 
     function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -348,7 +370,26 @@
     }
 
     function createToast() {
-    const hargas = ["62.000", "310.000", "620.000", "1.240.000", "3.100.000"];
+    const transaksi = [
+    { nominal: "62.000", chip: "1B" },
+    { nominal: "186.000", chip: "3B" },
+    { nominal: "248.000", chip: "4B" },
+    { nominal: "310.000", chip: "5B" },
+    { nominal: "434.000", chip: "7B" },
+    { nominal: "496.000", chip: "8B" },
+    { nominal: "558.000", chip: "9B" },
+    { nominal: "620.000", chip: "10B" },
+    { nominal: "868.000", chip: "14B" },
+    { nominal: "930.000", chip: "15B" },
+    { nominal: "1.240.000", chip: "20B" },
+    { nominal: "1.550.000", chip: "25B" },
+    { nominal: "1.860.000", chip: "30B" },
+    { nominal: "3.100.000", chip: "50B" },
+    { nominal: "6.200.000", chip: "100B" },
+    { nominal: "9.300.000", chip: "150B" },
+    { nominal: "12.400.000", chip: "200B" }
+];
+    const trx = getRandom(transaksi);
     const banks = ["Dana", "OVO", "GoPay", "BCA", "BRI"];
 
     const toast = document.createElement('div');
@@ -361,7 +402,8 @@
         <div>
             <div class="toast-title">BONGKAR SUKSES</div>
             <div class="toast-user">${getRandom(players)}</div>
-            <div class="toast-desc">${getRandom(banks)} - Rp ${getRandom(hargas)}</div>
+            <div class="toast-desc">
+                ${getRandom(banks)} - Rp ${trx.nominal} - ${trx.chip}
         </div>
     `;
     // WAJIB ADA
