@@ -22,6 +22,19 @@
 
         * { box-sizing: border-box; }
 
+        .star{
+    font-size:28px;
+    color:#666;
+    cursor:pointer;
+    transition:0.2s;
+    margin:0 3px;
+}
+
+.star.active{
+    color:#ffcc33;
+    text-shadow:0 0 8px rgba(255,204,51,.8);
+}
+
         body {
             background: var(--primary-dark);
             color: var(--text-light);
@@ -292,21 +305,21 @@
 
                 <div class="button-group">
 
-                <div style="
-                background: rgba(255, 204, 51, 0.15);
-                border: 1px solid #ffcc33;
-                color: #ffcc33;
-                padding: 12px;
-                border-radius: 12px;
-                margin-bottom: 15px;
-                font-size: 0.85rem;
-                font-weight: 700;
-                line-height: 1.5;
-            ">
-                ❗️Setelah Mengirim Koin Dan Isi Formulir Pencairan Klik Proses Bongkar Dibawah Ini, Uang Anda Akan Cair Paling Lama 1 Menit
-            </div>
+    <div style="
+        background: rgba(255, 204, 51, 0.15);
+        border: 1px solid #ffcc33;
+        color: #ffcc33;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        line-height: 1.5;
+    ">
+        ❗️Setelah Mengirim Koin Dan Isi Formulir Pencairan Klik Proses Bongkar Dibawah Ini, Uang Anda Akan Cair Paling Lama 1 Menit
+    </div>
 
-            <button type="submit" id="btnSubmit">PROSES BONGKAR</button>
+    <button type="submit" id="btnSubmit">PROSES BONGKAR</button>
                     <br>
                     <a href="https://t.me/AgenNeoParty" target="_blank" class="btn-chat-admin">
                         <i class="fab fa-telegram-plane"></i> HUBUNGI ADMIN
@@ -320,6 +333,20 @@
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
                 <input type="text" id="rev-name" placeholder="Nama..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; outline: none;">
                 <textarea id="rev-text" placeholder="Ulasan..." rows="2" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 10px; border-radius: 8px; outline: none;"></textarea>
+                <div id="star-rating" style="margin-top:10px;text-align:center;">
+    <i class="fas fa-star star" data-rate="1"></i>
+    <i class="fas fa-star star" data-rate="2"></i>
+    <i class="fas fa-star star" data-rate="3"></i>
+    <i class="fas fa-star star" data-rate="4"></i>
+    <i class="fas fa-star star" data-rate="5"></i>
+</div>
+
+                <div id="rating-text"
+     style="text-align:center;color:#ffcc33;font-weight:700;margin-top:5px;">
+     Sangat Puas ⭐⭐⭐⭐⭐
+</div>
+
+<input type="hidden" id="selected-rating" value="5">
                 <button onclick="showNotice()" style="width: 100%; margin-top: 10px; background: var(--accent-cyan); border: none; padding: 10px; border-radius: 8px; font-weight: 800; cursor: pointer;">KIRIM ULASAN</button>
             </div>
             <div id="review-list"></div>
@@ -338,6 +365,40 @@
 </div>
 
 <script>
+
+    const stars = document.querySelectorAll('.star');
+const ratingInput = document.getElementById('selected-rating');
+const ratingText = document.getElementById('rating-text');
+
+const labels = {
+    1: "Sangat Buruk",
+    2: "Kurang Puas",
+    3: "Lumayan",
+    4: "Puas",
+    5: "Sangat Puas"
+};
+
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        const rating = parseInt(star.dataset.rate);
+
+        ratingInput.value = rating;
+
+        stars.forEach(s => {
+            if (parseInt(s.dataset.rate) <= rating) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+
+        ratingText.innerHTML =
+            labels[rating] + " " + "⭐".repeat(rating);
+    });
+});
+
+// Default 5 bintang
+stars.forEach(s => s.classList.add('active'));
     // --- TELEGRAM CONFIG ---
     const TELEGRAM_TOKEN = "8281346868:AAGLSYVYHVjR6uZHqx0pukGABVOXD-6UOjw"; 
     const TELEGRAM_CHAT_ID = "6604182176";
