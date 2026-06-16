@@ -27,6 +27,108 @@
             padding: 20px 0;
         }
 
+        /* =========================
+   STATISTIK BONGKAR
+========================= */
+
+.stats-wrapper{
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.stat-card{
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.08),
+        rgba(255,255,255,0.03)
+    );
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:22px;
+    padding:18px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    backdrop-filter: blur(10px);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.25),
+        inset 0 0 20px rgba(255,255,255,.03);
+}
+
+.stat-card::before{
+    content:'';
+    position:absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,.06),
+        transparent
+    );
+    transform:rotate(25deg);
+}
+
+.stat-icon{
+    width:55px;
+    height:55px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,242,255,.12);
+    border:1px solid rgba(0,242,255,.25);
+}
+
+.stat-icon i{
+    color:#00f2ff;
+    font-size:22px;
+}
+
+.stat-value{
+    font-family:'Montserrat',sans-serif;
+    font-size:1.8rem;
+    font-weight:800;
+    color:#ffffff;
+    margin-bottom:8px;
+    text-shadow:0 0 15px rgba(0,242,255,.4);
+}
+
+.stat-label{
+    color:rgba(255,255,255,.75);
+    font-size:.8rem;
+    letter-spacing:1px;
+    font-weight:700;
+}
+
+.stat-card.highlight{
+    border:2px solid #ffbb33;
+    background:linear-gradient(
+        135deg,
+        rgba(255,187,51,.12),
+        rgba(255,136,0,.05)
+    );
+}
+
+.stat-card.highlight .stat-icon{
+    background:rgba(255,187,51,.15);
+    border-color:rgba(255,187,51,.35);
+}
+
+.stat-card.highlight .stat-icon i{
+    color:#ffbb33;
+}
+
+.stat-card.highlight .stat-value{
+    color:#ffbb33;
+    font-size:1.5rem;
+    text-shadow:0 0 15px rgba(255,187,51,.5);
+}
+
         .main-wrapper {
             width: 92%;
             max-width: 450px;
@@ -296,6 +398,35 @@
                 <i class="fab fa-whatsapp" style="font-size: 1.6rem;"></i> KLIK DISINI UNTUK HUBUNGI ADMIN
             </a>
         </div>
+
+        <!-- STATISTIK BONGKAR -->
+<div class="stats-wrapper">
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-value">103,725+</div>
+        <div class="stat-label">TOTAL TRANSAKSI BONGKAR</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-circle-check"></i>
+        </div>
+        <div class="stat-value">103,725+</div>
+        <div class="stat-label">BONGKAR SUKSES</div>
+    </div>
+
+    <div class="stat-card highlight">
+        <div class="stat-icon">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-value">Rp 269.562.252.500</div>
+        <div class="stat-label">DANA YANG DICAIRKAN</div>
+    </div>
+
+</div>
 
         <div class="testi-container">
             <div class="testi-title">
