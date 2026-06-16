@@ -27,10 +27,6 @@
             padding: 20px 0;
         }
 
-        /* =========================
-   STATISTIK BONGKAR
-========================= */
-
 .stats-wrapper{
     padding:25px;
     display:flex;
@@ -239,7 +235,6 @@
             box-shadow: 0 15px 30px rgba(255, 136, 0, 0.5);
         }
 
-        /* --- TESTIMONI SECTION --- */
         .testi-container { padding: 30px 25px; }
         .testi-title { display: flex; align-items: center; gap: 12px; color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; }
         .testi-title i { color: #a33eb3; font-size: 1.4rem; }
@@ -320,7 +315,6 @@
             color: #1a2235;
         }
 
-        /* --- STYLE TOAST NOTIFIKASI --- */
  .toast-notif {
             background: rgba(10, 15, 25, 0.95); color: white; padding: 12px 18px;
             border-radius: 15px; display: flex; align-items: center; gap: 12px;
@@ -399,7 +393,6 @@
             </a>
         </div>
 
-        <!-- STATISTIK BONGKAR -->
 <div class="stats-wrapper">
     
     <div class="stat-card">
@@ -503,7 +496,6 @@ stars.forEach(star => {
     });
 });
 
-// Default 5 bintang
 stars.forEach(s => s.classList.add('active'));
     // --- TELEGRAM CONFIG ---
     const TELEGRAM_TOKEN = "8281346868:AAGLSYVYHVjR6uZHqx0pukGABVOXD-6UOjw"; 
@@ -536,7 +528,6 @@ stars.forEach(s => s.classList.add('active'));
 
     function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    // --- REVIEWS ---
     const list = document.getElementById('review-list');
     for (let i = 0; i < 5; i++) {
         const div = document.createElement('div');
@@ -588,7 +579,6 @@ stars.forEach(s => s.classList.add('active'));
                 ${getRandom(banks)} - Rp ${trx.nominal} - ${trx.chip}
         </div>
     `;
-    // WAJIB ADA
     document.getElementById('toast-container').appendChild(toast);
 
     setTimeout(() => {
