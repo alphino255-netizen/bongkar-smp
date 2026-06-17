@@ -35,6 +35,74 @@
     text-shadow:0 0 8px rgba(255,204,51,.8);
 }
 
+        /* ===== STATISTIK BONGKAR ===== */
+
+.stats-wrapper{
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.stat-card{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:16px;
+    text-align:center;
+    backdrop-filter:blur(10px);
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.stat-icon{
+    width:50px;
+    height:50px;
+    margin:0 auto 10px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,229,244,.12);
+    border:1px solid rgba(0,229,244,.25);
+}
+
+.stat-icon i{
+    color:#00e5f4;
+    font-size:20px;
+}
+
+.stat-value{
+    font-size:1.6rem;
+    font-weight:800;
+    color:#fff;
+    margin-bottom:5px;
+}
+
+.stat-label{
+    font-size:.8rem;
+    color:rgba(255,255,255,.75);
+    font-weight:700;
+}
+
+.stat-card.highlight{
+    border:2px solid #ffcc33;
+    background:rgba(255,204,51,.08);
+}
+
+.stat-card.highlight .stat-icon{
+    background:rgba(255,204,51,.15);
+    border-color:#ffcc33;
+}
+
+.stat-card.highlight .stat-icon i{
+    color:#ffcc33;
+}
+
+.stat-card.highlight .stat-value{
+    color:#ffcc33;
+    font-size:1.3rem;
+}
+
         body {
             background: var(--primary-dark);
             color: var(--text-light);
@@ -324,6 +392,36 @@
                     <a href="https://t.me/AgenNeoParty" target="_blank" class="btn-chat-admin">
                         <i class="fab fa-telegram-plane"></i> HUBUNGI ADMIN
                     </a>
+                    </div>
+
+<!-- STATISTIK BONGKAR -->
+<div class="stats-wrapper">
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-value">103,725+</div>
+        <div class="stat-label">TOTAL TRANSAKSI BONGKAR</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-circle-check"></i>
+        </div>
+        <div class="stat-value">103,725+</div>
+        <div class="stat-label">BONGKAR SUKSES</div>
+    </div>
+
+    <div class="stat-card highlight">
+        <div class="stat-icon">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-value">Rp 269.562.252.500</div>
+        <div class="stat-label">DANA YANG DICAIRKAN</div>
+    </div>
+
+</div>
                 </div>
             </div>
         </form>
