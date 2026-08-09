@@ -27,21 +27,69 @@
             padding: 20px 0;
         }
 
+
+        .admin-notice{
+            margin:0 auto 18px;
+            padding:12px 16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            max-width:390px;
+            color:#fff;
+            font-size:.78rem;
+            font-weight:800;
+            line-height:1.45;
+            letter-spacing:.35px;
+            text-align:center;
+            background:linear-gradient(135deg,rgba(0,242,255,.14),rgba(37,211,102,.10));
+            border:1px solid rgba(0,242,255,.28);
+            border-radius:16px;
+            box-shadow:0 8px 25px rgba(0,0,0,.18), inset 0 0 18px rgba(0,242,255,.04);
+            backdrop-filter:blur(10px);
+            animation:noticePulse 2.8s ease-in-out infinite;
+        }
+
+        .admin-notice i{
+            color:#00f2ff;
+            font-size:1rem;
+            flex-shrink:0;
+            filter:drop-shadow(0 0 6px rgba(0,242,255,.5));
+        }
+
+        .admin-notice b{
+            color:#fff;
+        }
+
+        @keyframes noticePulse{
+            0%,100%{box-shadow:0 8px 25px rgba(0,0,0,.18),0 0 0 rgba(0,242,255,0)}
+            50%{box-shadow:0 8px 25px rgba(0,0,0,.18),0 0 18px rgba(0,242,255,.12)}
+        }
+
+        @media(max-width:480px){
+            .admin-notice{
+                margin-left:2px;
+                margin-right:2px;
+                padding:11px 13px;
+                font-size:.73rem;
+            }
+        }
+
         .contact-buttons{
     display:flex;
     flex-direction:column;
-    gap:18px;
-    margin-top:25px;
+    gap:14px;
+    margin-top:20px;
 }
 
 .contact-card{
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:14px;
     text-decoration:none;
 
-    padding:18px;
-    border-radius:22px;
+    padding:14px;
+    border-radius:18px;
 
     background:rgba(255,255,255,.05);
 
@@ -58,9 +106,9 @@
 }
 
 .contact-icon{
-    width:72px;
-    height:72px;
-    border-radius:18px;
+    width:58px;
+    height:58px;
+    border-radius:15px;
 
     display:flex;
     align-items:center;
@@ -70,7 +118,7 @@
 }
 
 .contact-icon i{
-    font-size:42px;
+    font-size:32px;
     color:white;
 }
 
@@ -90,7 +138,7 @@
 
     color:#fff;
 
-    font-size:1.15rem;
+    font-size:1rem;
 
     font-weight:800;
 
@@ -401,7 +449,16 @@
             color: #1a2235;
         }
 
- .toast-notif {
+ 
+        @media(max-width:600px){
+            #toast-container{
+                top:14px !important;
+                left:14px !important;
+                width:calc(100vw - 28px) !important;
+            }
+        }
+
+.toast-notif {
             background: rgba(10, 15, 25, 0.95); color: white; padding: 12px 18px;
             border-radius: 15px; display: flex; align-items: center; gap: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
@@ -450,6 +507,92 @@
     color:#ffcc33;
     text-shadow:0 0 8px rgba(255,204,51,.8);
 }
+    
+        .toast-container{
+            position:absolute !important;
+            top:20px !important;
+            left:20px !important;
+            right:auto !important;
+            bottom:auto !important;
+            z-index:2147483647 !important;
+            width:min(330px, calc(100vw - 40px));
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            pointer-events:none;
+            transform:none !important;
+        }
+
+        .toast-container .toast-notif{
+            position:relative;
+            left:auto;
+            right:auto;
+            top:auto;
+            bottom:auto;
+            width:100%;
+            margin:0;
+            pointer-events:auto;
+        }
+
+        @media(max-width:600px){
+            .toast-container{
+                top:14px !important;
+                left:14px !important;
+                width:calc(100vw - 28px) !important;
+            }
+        }
+
+    
+        /* Admin contact buttons — compact & slim */
+        .contact-buttons{
+            gap:10px;
+            margin-top:16px;
+        }
+
+        .contact-card{
+            gap:11px;
+            padding:10px 13px;
+            border-radius:15px;
+            min-height:64px;
+        }
+
+        .contact-icon{
+            width:46px;
+            height:46px;
+            border-radius:13px;
+        }
+
+        .contact-icon i{
+            font-size:25px;
+        }
+
+        .contact-text{
+            font-size:.84rem;
+            line-height:1.3;
+            letter-spacing:.25px;
+        }
+
+        @media(max-width:480px){
+            .contact-card{
+                padding:9px 11px;
+                min-height:58px;
+            }
+
+            .contact-icon{
+                width:42px;
+                height:42px;
+                border-radius:12px;
+            }
+
+            .contact-icon i{
+                font-size:23px;
+            }
+
+            .contact-text{
+                font-size:.78rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -457,6 +600,11 @@
     <div class="main-wrapper">
         <div class="withdraw-header">
             <img src="banner.jpg" alt="Withdraw Neo Party" class="banner-img">
+
+            <div class="admin-notice">
+                <i class="fas fa-circle-info"></i>
+                <span>KLIK TOMBOL <b>WHATSAPP / TELEGRAM</b> UNTUK HUBUNGI ADMIN</span>
+            </div>
 
             <div class="contact-buttons">
 
@@ -490,29 +638,37 @@
         </div>
 
 <div class="stats-wrapper">
-    
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
-        </div>
-        <div class="stat-value">103,725+</div>
-        <div class="stat-label">TOTAL TRANSAKSI BONGKAR</div>
-    </div>
 
     <div class="stat-card">
         <div class="stat-icon">
             <i class="fas fa-circle-check"></i>
         </div>
-        <div class="stat-value">103,725+</div>
-        <div class="stat-label">BONGKAR SUKSES</div>
+        <div class="stat-value">50000+</div>
+        <div class="stat-label">TRANSAKSI SUKSES</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">47482+</div>
+        <div class="stat-label">PELANGGAN PUAS</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-value">5★</div>
+        <div class="stat-label">RATING KEPERCAYAAN</div>
     </div>
 
     <div class="stat-card highlight">
         <div class="stat-icon">
-            <i class="fas fa-wallet"></i>
+            <i class="fas fa-shield-halved"></i>
         </div>
-        <div class="stat-value">Rp 269.562.252.500</div>
-        <div class="stat-label">DANA YANG DICAIRKAN</div>
+        <div class="stat-value">100%</div>
+        <div class="stat-label">KOMITMEN AMAN</div>
     </div>
 
 </div>
@@ -550,7 +706,7 @@
         </div>
     </div>
 
-    <div id="toast-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 10000; pointer-events: none;"></div>
+    <div id="toast-container" class="toast-container"></div>
 
     <div class="modal-overlay" id="modalNotice">
         <div class="modal-content">
