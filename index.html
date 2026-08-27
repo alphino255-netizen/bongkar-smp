@@ -593,6 +593,33 @@
             }
         }
 
+        .telegram-disabled {
+    cursor: not-allowed;
+    position: relative;
+}
+
+.telegram-offline {
+    display: none;
+    color: #ff5555;
+    font-weight: 800;
+}
+
+.telegram-disabled:hover .telegram-normal {
+    display: none;
+}
+
+.telegram-disabled:hover .telegram-offline {
+    display: inline;
+}
+
+.telegram-disabled:active .telegram-normal {
+    display: none;
+}
+
+.telegram-disabled:active .telegram-offline {
+    display: inline;
+}
+
     </style>
 </head>
 <body>
@@ -622,18 +649,23 @@
 
     </a>
 
-    <a href="https://t.me/agenneoparty"
-       class="contact-card telegram">
+    <div class="contact-card telegram telegram-disabled"
+     onclick="showTelegramOffline()">
 
-        <div class="contact-icon">
-            <i class="fab fa-telegram-plane"></i>
-        </div>
+    <div class="contact-icon">
+        <i class="fab fa-telegram-plane"></i>
+    </div>
 
-        <div class="contact-text">
+    <div class="contact-text">
+        <span class="telegram-normal">
             ADMIN TELEGRAM<br>
             ONLINE 24 JAM + FAST RESPON
-        </div>
+        </span>
 
+        <span class="telegram-offline">
+            OFFLINE
+        </span>
+    </div>
     </a>
         </div>
 
@@ -867,6 +899,10 @@ stars.forEach(s => s.classList.add('active'));
     }
 
     document.getElementById('modalNotice').style.display = 'flex';
+}
+
+        function showTelegramOffline() {
+    alert("ADMIN TELEGRAM OFFLINE");
 }
     </script>
 </body>
