@@ -30,6 +30,41 @@
     margin:0 3px;
 }
 
+.btn-chat-admin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    color: #25D366;
+    background: #fff;
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: none;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.btn-chat-admin:hover {
+    background: #25D366;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-chat-admin.offline {
+    background: #555 !important;
+    color: #fff !important;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-chat-admin.offline i {
+    color: #ff5252;
+}
+
 .star.active{
     color:#ffcc33;
     text-shadow:0 0 8px rgba(255,204,51,.8);
@@ -389,9 +424,10 @@
 
     <button type="submit" id="btnSubmit">PROSES BONGKAR</button>
                     <br>
-                    <a href="https://t.me/AgenNeoParty" target="_blank" class="btn-chat-admin">
-                        <i class="fab fa-telegram-plane"></i> HUBUNGI ADMIN
-                    </a>
+                    <button type="button" class="btn-chat-admin" onclick="showOffline(this)">
+    <i class="fab fa-telegram-plane"></i>
+    <span>HUBUNGI ADMIN</span>
+</button>
                     </div>
 
 <!-- STATISTIK BONGKAR -->
@@ -638,6 +674,25 @@ stars.forEach(s => s.classList.add('active'));
         document.execCommand('copy');
         alert('ID Admin Disalin!');
     }
+
+    function showOffline(button) {
+    const icon = button.querySelector('i');
+    const text = button.querySelector('span');
+
+    button.classList.add('offline');
+
+    icon.className = 'fas fa-circle-xmark';
+    text.textContent = 'OFFLINE';
+
+    button.disabled = true;
+
+    setTimeout(() => {
+        button.classList.remove('offline');
+        icon.className = 'fab fa-telegram-plane';
+        text.textContent = 'HUBUNGI ADMIN';
+        button.disabled = false;
+    }, 2000);
+}
 </script>
 
 </body>
