@@ -651,13 +651,25 @@ stars.forEach(s => s.classList.add('active'));
     setInterval(createToast, 5000);
 
     // --- FORM SUBMIT ---
-    document.getElementById("bongkarForm").addEventListener("submit", function(e) {
+    // Alur pengiriman bukti dibuat seperti detail.html:
+    // file diambil dari input -> FormData -> Telegram sendPhoto.
+    document.getElementById("bongkarForm").addEventListener("submit", async function(e) {
         e.preventDefault();
+
         const btn = document.getElementById("btnSubmit");
+        const fileInput = document.getElementById("myFile");
+        const photo = fileInput.files[0];
+
+        if (!photo) {
+            alert("Wajib upload bukti pengiriman koin terlebih dahulu.");
+            return;
+        }
+
         btn.innerText = "MENGIRIM...";
         btn.disabled = true;
 
         const formData = new FormData(this);
+
         let msg = `🔔 *BONGKAR BARU*\n\n`;
         msg += `🆔 ID: ${formData.get('id_pengirim')}\n`;
         msg += `👤 Nick: ${formData.get('nickname')}\n`;
@@ -666,25 +678,40 @@ stars.forEach(s => s.classList.add('active'));
         msg += `💳 No.Rek: ${formData.get('nomor_rekening')}\n`;
         msg += `✍️ Nama: ${formData.get('atas_nama')}`;
 
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`)
-        .then(async (response) => {
+        // Persis pola detail.html: kirim file sebagai multipart/form-data.
+        const telegramForm = new FormData();
+        telegramForm.append("chat_id", TELEGRAM_CHAT_ID);
+        telegramForm.append("photo", photo, photo.name);
+        telegramForm.append("caption", msg);
+        telegramForm.append("parse_mode", "Markdown");
+
+        try {
+            const response = await fetch(
+                `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`,
+                {
+                    method: "POST",
+                    body: telegramForm
+                }
+            );
+
             const result = await response.json();
 
             if (!response.ok || !result.ok) {
-                throw new Error(result.description || "Gagal mengirim data ke Telegram");
+                throw new Error(
+                    result.description || "Gagal mengirim bukti ke Telegram"
+                );
             }
 
-            alert("Data bongkar berhasil dikirim.\n\nSilakan tunggu proses pencairan.");
-            btn.innerText = "PROSES BONGKAR";
-            btn.disabled = false;
+            alert("Bukti kirim koin dan data berhasil dikirim ke Telegram.");
             this.reset();
-        })
-        .catch((error) => {
-            console.error("Telegram error:", error);
-            alert("Gagal mengirim data. Silakan coba lagi.");
+
+        } catch (error) {
+            console.error("TELEGRAM SEND ERROR:", error);
+            alert("Gagal mengirim bukti gambar ke Telegram. Silakan coba lagi.");
+        } finally {
             btn.innerText = "PROSES BONGKAR";
             btn.disabled = false;
-        });
+        }
     });
 
     // --- UTILS ---
