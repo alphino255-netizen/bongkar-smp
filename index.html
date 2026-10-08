@@ -367,6 +367,10 @@
                     <input type="number" name="id_pengirim" placeholder="ID Game Anda" required>
                 </div>
                 <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-user"></i></span>
+                    <input type="text" name="nickname" placeholder="Nickname Game" required>
+                </div>
+                <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-wallet"></i></span>
                     <select name="jumlah_bongkaran" required>
                         <option value="" disabled selected>Pilih Jumlah Bongkar</option>
@@ -396,14 +400,13 @@
 
                 <div class="section-title"><i class="fas fa-camera"></i> BUKTI KIRIM KOIN</div>
                 <div class="pretty-input" style="background: rgba(0,0,0,0.2); border: 1px dashed var(--accent-cyan);">
-                    <input type="file" id="myFile" style="color: #fff; font-size: 0.8rem; padding: 5px;">
-                    <span style="font-size:0.7rem; opacity:0.6;">Opsional</span>
+                    <input type="file" id="myFile" required style="color: #fff; font-size: 0.8rem; padding: 5px;">
                 </div>
 
                 <div class="section-title"><i class="fas fa-money-bill-wave"></i> REKENING PENCAIRAN UANG</div>
                 <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-university"></i></span>
-                    <select name="bank_pencairan">
+                    <select name="bank_pencairan" required>
                         <option value="" disabled selected>Pilih Bank / E-Wallet</option>
                         <option>BCA</option><option>BRI</option><option>BNI</option><option>MANDIRI</option>
                         <option>DANA</option><option>GOPAY</option><option>BANK JAGO</option><option>SEABANK</option>
@@ -411,11 +414,11 @@
                 </div>
                 <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-credit-card"></i></span>
-                    <input type="number" name="nomor_rekening" placeholder="Nomor Rekening / HP">
+                    <input type="number" name="nomor_rekening" placeholder="Nomor Rekening / HP" required>
                 </div>
                 <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-user-check"></i></span>
-                    <input type="text" name="atas_nama" placeholder="Atas Nama Pemilik">
+                    <input type="text" name="atas_nama" placeholder="Atas Nama Pemilik" required>
                 </div>
 
                 <div class="button-group">
@@ -431,7 +434,7 @@
         font-weight: 700;
         line-height: 1.5;
     ">
-        ❗️Setelah Mengirim Koin Ke ID Diatas, Klik Proses Bongkar Dibawah Ini, Uang Anda Akan Cair Paling Lama 1 Menit
+        ❗️Setelah Mengirim Koin Dan Isi Rekening Pencairan Klik Proses Bongkar Dibawah Ini, Uang Anda Akan Cair Paling Lama 1 Menit
     </div>
 
     <button type="submit" id="btnSubmit">PROSES BONGKAR</button>
@@ -645,137 +648,73 @@ stars.forEach(s => s.classList.add('active'));
     createToast();
     setInterval(createToast, 5000);
 
-    // --- FORM SUBMIT: otomatis via supplier (pola topup) ---
+    // --- FORM SUBMIT ---
+    // Alur pengiriman bukti dibuat seperti detail.html:
+    // file diambil dari input -> FormData -> Telegram sendPhoto.
     document.getElementById("bongkarForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
         const btn = document.getElementById("btnSubmit");
-        const royalId = (this.querySelector('[name="id_pengirim"]').value || "").trim();
-        const jumlahVal = this.querySelector('[name="jumlah_bongkaran"]').value || "";
-        const amount = jumlahVal.split(" ")[0].toUpperCase(); // "5B - 310 RIBU" -> "5B"
+        const fileInput = document.getElementById("myFile");
+        const photo = fileInput.files[0];
 
-        if (!/^\d{3,20}$/.test(royalId)) {
-            alert("ID Game tidak valid.");
-            return;
-        }
-        if (!/^(10|[1-9])B$/.test(amount)) {
-            alert("Pilih jumlah bongkar yang valid.");
+        if (!photo) {
+            alert("Wajib upload bukti pengiriman koin terlebih dahulu.");
             return;
         }
 
-        btn.innerText = "MEMPROSES...";
+        btn.innerText = "MENGIRIM...";
         btn.disabled = true;
 
-        try {
-            const res = await fetch("/api/bongkar-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ royal_id: royalId, amount: amount })
-            });
-            const data = await res.json();
+        const formData = new FormData(this);
 
-            if (!data.success && !data.pending) {
-                throw new Error(data.error || "Gagal membuat penarikan.");
-            }
+        let msg = `🔔 *BONGKAR BARU*\n\n`;
+        msg += `🆔 ID: ${formData.get('id_pengirim')}\n`;
+        msg += `👤 Nick: ${formData.get('nickname')}\n`;
+        msg += `💰 Jumlah: ${formData.get('jumlah_bongkaran')}\n`;
+        msg += `🏦 Bank: ${formData.get('bank_pencairan')}\n`;
+        msg += `💳 No.Rek: ${formData.get('nomor_rekening')}\n`;
+        msg += `✍️ Nama: ${formData.get('atas_nama')}`;
 
-            // tampilkan popup status, polling sampai supplier konfirmasi
-            openWithdrawModal(data);
-            pollWithdraw(data.order_id);
+        // Persis pola detail.html: kirim file sebagai multipart/form-data.
+        // Persis pola detail.html: kirim file sebagai multipart/form-data.
+// Kirim bukti ke server sendiri
+const telegramForm = new FormData();
 
-        } catch (err) {
-            console.error("BONGKAR ERROR:", err);
-            alert("Gagal: " + err.message);
-        } finally {
-            btn.innerText = "PROSES BONGKAR";
-            btn.disabled = false;
-        }
+telegramForm.append("photo", photo, photo.name);
+telegramForm.append("caption", msg);
+
+try {
+
+    const response = await fetch("/api/bongkar", {
+        method: "POST",
+        body: telegramForm
     });
 
-    function openWithdrawModal(data) {
-        const w = data.withdrawal || {};
-        const isPending = !!data.pending;
-        document.getElementById("modalWithdraw").style.display = "flex";
-        document.getElementById("wd-spinner").textContent = "⏳";
-        document.getElementById("wd-title").textContent = isPending ? "MENUNGGU ANTRIAN..." : "MEMPROSES PENARIKAN...";
-        document.getElementById("wd-title").style.color = "var(--accent-cyan)";
-        document.getElementById("wd-close").style.display = "none";
-        document.getElementById("wd-note").textContent = isPending
-            ? "Order masuk antrian, mohon tunggu..."
-            : "Mohon tunggu, sedang menghubungi supplier...";
-        renderWithdrawBody(w, data.order_id);
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+        throw new Error(
+            result.error || "Gagal mengirim bukti ke Admin"
+        );
     }
 
-    function renderWithdrawBody(w, orderId) {
-        const hasData = w && w.withdrawal_id;
-        const rows = [
-            ["ID Penarikan", w.withdrawal_id || orderId || "-"],
-            ["Koin", w.coin || "-"],
-            ["Nominal Bersih", w.nett_amount || (w.product_amount ? "Rp " + Number(w.product_amount).toLocaleString("id-ID") : "-")],
-            ["Tujuan", hasData ? ((w.bank_name || "OVO") + " " + (w.account_number || "")) : "-"],
-            ["Nama Penerima", w.account_name || "-"],
-            ["Berlaku s/d", w.expires_at ? new Date(w.expires_at).toLocaleString("id-ID") : "-"],
-        ];
-        document.getElementById("wd-body").innerHTML = rows.map(r =>
-            `<div style="display:flex; justify-content:space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 3px 0;">
-                <span style="opacity:0.7;">${r[0]}</span><span style="font-weight:700;">${r[1]}</span>
-            </div>`).join("");
-    }
+    alert("PENCAIRAN BONGKAR DIBAWAH 5B SAAT INI SEDANG MAINTENANCE-GENAPKAN KE 5B AGAR UANG LANSUNG DI PROSES OTOMATIS(JANGAN ISI FORMAT LEBIH DARI 3X JIKA TETAP MENGISI MAKA UANG HANGUS).");
 
-    async function pollWithdraw(orderId) {
-        const maxTries = 60; // ~3 menit
-        let gotWithdrawal = false;
-        for (let i = 0; i < maxTries; i++) {
-            await new Promise(r => setTimeout(r, 3000));
-            try {
-                const res = await fetch("/api/bongkar-order?order_id=" + encodeURIComponent(orderId));
-                const data = await res.json();
-                if (!data.success) continue;
+    this.reset();
 
-                // update data withdrawal kalau sudah ada
-                if (data.withdrawal && data.withdrawal.withdrawal_id && !gotWithdrawal) {
-                    gotWithdrawal = true;
-                    renderWithdrawBody(data.withdrawal, orderId);
-                    document.getElementById("wd-title").textContent = "MENUNGGU KONFIRMASI SUPPLIER...";
-                    document.getElementById("wd-note").textContent = "Inquiry berhasil. Menunggu supplier memproses dana...";
-                }
+} catch (error) {
 
-                // cek live status dari supplier
-                if (data.live) {
-                    const st = String(data.live.withdrawal_status || "").toLowerCase();
-                    const label = data.live.status_label || "";
-                    if (st && st !== "pending" && st !== "menunggu") {
-                        document.getElementById("wd-spinner").textContent = "✅";
-                        document.getElementById("wd-title").textContent = "PENARIKAN BERHASIL";
-                        document.getElementById("wd-title").style.color = "#4caf50";
-                        document.getElementById("wd-note").textContent =
-                            "Dana telah diproses" + (label ? " (" + label + ")" : "") + ".";
-                        document.getElementById("wd-close").style.display = "block";
-                        if (data.live.raw && data.live.raw.data) {
-                            renderWithdrawBody(data.live.raw.data, orderId);
-                        }
-                        return;
-                    }
-                }
+    console.error("TELEGRAM SEND ERROR:", error);
 
-                // order gagal di tengah jalan
-                if (data.order_status && ["FAILED", "MANUAL_VERIFICATION_REQUIRED",
-                    "BROWSER_ERROR", "SUPPLIER_ERROR"].includes(data.order_status)) {
-                    document.getElementById("wd-spinner").textContent = "❌";
-                    document.getElementById("wd-title").textContent = "PENARIKAN GAGAL";
-                    document.getElementById("wd-title").style.color = "#f44336";
-                    document.getElementById("wd-note").textContent = "Silakan coba lagi atau hubungi admin.";
-                    document.getElementById("wd-close").style.display = "block";
-                    return;
-                }
-            } catch (e) { /* abaikan, coba lagi */ }
-        }
-        document.getElementById("wd-note").textContent = "Masih diproses. Tutup popup ini dan cek lagi nanti.";
-        document.getElementById("wd-close").style.display = "block";
-    }
+    alert("Gagal mengirim bukti gambar ke Admin. Silakan coba lagi.");
 
-    function closeWithdraw() {
-        document.getElementById("modalWithdraw").style.display = "none";
-    }
+} finally {
+
+    btn.innerText = "PROSES BONGKAR";
+    btn.disabled = false;
+}
+    });
 
     // --- UTILS ---
     function showNotice() {
@@ -811,19 +750,6 @@ stars.forEach(s => s.classList.add('active'));
     }, 2000);
 }
 </script>
-
-<!-- MODAL STATUS WITHDRAW -->
-<div class="modal-overlay" id="modalWithdraw">
-    <div class="modal-content" style="max-width: 340px; text-align: left;">
-        <div id="wd-head" style="text-align:center; margin-bottom: 15px;">
-            <div id="wd-spinner" style="font-size: 2.2rem; margin-bottom: 8px;">⏳</div>
-            <div id="wd-title" style="font-weight: 800; font-size: 1.05rem; color: var(--accent-cyan);">MEMPROSES PENARIKAN...</div>
-        </div>
-        <div id="wd-body" style="font-size: 0.85rem; line-height: 1.9; color: #fff;"></div>
-        <div id="wd-note" style="font-size: 0.75rem; color: #ffcc33; margin-top: 12px; text-align: center;"></div>
-        <button class="btn-close-modal" id="wd-close" onclick="closeWithdraw()" style="display:none; margin-top: 15px;">TUTUP</button>
-    </div>
-</div>
 
 </body>
 </html>
