@@ -15,7 +15,7 @@
  */
 
 const PROXY_TIMEOUT_MS = 10000;
-const POLL_INTERVAL_MS = 2500;
+const POLL_INTERVAL_MS = 1000;   // (G) dulu 2500ms, sekarang 1000ms
 const POLL_BUDGET_MS = 50000;
 
 const ALLOWED_ORIGINS = [
@@ -129,8 +129,8 @@ module.exports = async (req, res) => {
 
     const deadline = Date.now() + POLL_BUDGET_MS;
     let order = null;
+    // (G) poll dulu, sleep di akhir iterasi — jangan sleep sebelum poll pertama
     while (Date.now() < deadline) {
-      await sleep(POLL_INTERVAL_MS);
       const g = await proxyFetch(PROXY_URL, PROXY_KEY,
         `/api/withdraw/${encodeURIComponent(orderId)}`);
       order = g.data && g.data.order;
@@ -139,6 +139,7 @@ module.exports = async (req, res) => {
         break;
       }
       order = order || { status: 'PROCESSING' };
+      await sleep(POLL_INTERVAL_MS);
     }
 
     if (order && order.status === 'SUCCESS' && order.result) {
