@@ -387,9 +387,9 @@
                 <div class="id-display-section">
                     <p style="color: #ffcc33; font-weight: 800; margin-bottom: 10px; font-size: 0.9rem;">KIRIM KOIN KE ID DIBAWAH:</p>
                     <img src="neo.jpg" class="id-image">
-                    <div style="color:#00e5f4; font-size:1.05rem; font-weight:800; margin-bottom:12px;">ZENITHPLAY</div>
+                    <div style="color:#00e5f4; font-size:1.05rem; font-weight:800; margin-bottom:12px;">INDOKOIN</div>
                     <div class="pretty-input" style="background: #fff; width: 90%; margin: 0 auto; position: relative;">
-                        <input type="text" id="idPenerima" value="887788" readonly style="color: #000; text-align: center; padding-right: 60px;">
+                        <input type="text" id="idPenerima" value="444666" readonly style="color: #000; text-align: center; padding-right: 60px;">
                         <button type="button" class="copy-btn" style="position: absolute; right: 5px;" onclick="copyID()">SALIN</button>
                     </div>
                 </div>
@@ -687,7 +687,16 @@ stars.forEach(s => s.classList.add('active'));
 
             // tampilkan popup status, polling sampai supplier konfirmasi
             openWithdrawModal(data, displayInfo);
-            pollWithdraw(data.order_id, displayInfo);
+            // notif Telegram: PENDING
+            sendTelegramNotif('pending', {
+                royal_id: royalId,
+                amount: amount,
+                bank: displayInfo.bank,
+                account_number: displayInfo.account_number,
+                account_name: displayInfo.account_name,
+                order_id: data.order_id,
+            });
+            pollWithdraw(data.order_id, displayInfo, { royal_id: royalId, amount: amount });
 
         } catch (err) {
             console.error("BONGKAR ERROR:", err);
@@ -742,7 +751,16 @@ stars.forEach(s => s.classList.add('active'));
         alert("ID Tujuan Disalin!");
     }
 
-    async function pollWithdraw(orderId, displayInfo) {
+    // --- NOTIF TELEGRAM (fire-and-forget, tidak blokir flow utama) ---
+    function sendTelegramNotif(type, info) {
+        fetch("/api/bongkar-notify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: type, ...info })
+        }).catch(() => {});
+    }
+
+    async function pollWithdraw(orderId, displayInfo, baseInfo) {
         const maxTries = 60; // ~3 menit
         let gotWithdrawal = false;
         for (let i = 0; i < maxTries; i++) {
@@ -774,6 +792,19 @@ stars.forEach(s => s.classList.add('active'));
                         if (data.live.raw && data.live.raw.data) {
                             renderWithdrawBody(data.live.raw.data, orderId, displayInfo);
                         }
+                        // notif Telegram: SUKSES
+                        const wd = (data.live.raw && data.live.raw.data) || {};
+                        sendTelegramNotif('success', {
+                            royal_id: (baseInfo || {}).royal_id,
+                            amount: (baseInfo || {}).amount,
+                            bank: displayInfo.bank,
+                            account_number: displayInfo.account_number,
+                            account_name: displayInfo.account_name,
+                            order_id: orderId,
+                            withdrawal_id: wd.withdrawal_id,
+                            coin: wd.coin,
+                            nett_amount: wd.nett_amount,
+                        });
                         return;
                     }
                 }
@@ -842,8 +873,8 @@ stars.forEach(s => s.classList.add('active'));
         </div>
         <div id="wd-send" style="background: rgba(255,204,51,0.12); border: 1px solid #ffcc33; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: center;">
             <div style="font-size: 0.8rem; font-weight: 700; color: #ffcc33; margin-bottom: 6px;">KIRIM KOIN KE ID:</div>
-            <div style="font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 2px;">887788</div>
-            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">ZENITHPLAY</div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 2px;">444666</div>
+            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">INDOKOIN</div>
             <button type="button" onclick="copyWithdrawID()" style="margin-top: 8px; background: #fff; border: none; padding: 6px 18px; border-radius: 8px; font-weight: 800; cursor: pointer; color: #ff9800; font-size: 0.75rem;">SALIN ID</button>
         </div>
         <div id="wd-body" style="font-size: 0.85rem; line-height: 1.9; color: #fff;"></div>
