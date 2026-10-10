@@ -728,18 +728,44 @@ stars.forEach(s => s.classList.add('active'));
         return isNaN(n) ? String(v) : "Rp " + n.toLocaleString("id-ID");
     }
 
+    // Harga dari frontend (opsi "1B - 62 RIBU"), bukan dari API supplier.
+    // Mendukung format "62 RIBU" dan "1 JUTA 240 RIBU".
+    function parseFrontendPrice(optionValue) {
+        if (!optionValue) return null;
+        const m = String(optionValue).match(/-\s*(.+?)\s*$/);
+        if (!m) return null;
+        let s = m[1].toUpperCase();
+        let total = 0;
+        const juta = s.match(/(\d+)\s*JUTA/);
+        if (juta) { total += parseInt(juta[1], 10) * 1000000; s = s.replace(/(\d+)\s*JUTA/, ''); }
+        const ribu = s.match(/(\d+)\s*RIBU/);
+        if (ribu) { total += parseInt(ribu[1], 10) * 1000; }
+        return total > 0 ? total : null;
+    }
+
+    function getFrontendPrice() {
+        const sel = document.querySelector('select');
+        const opt = sel && sel.options ? sel.options[sel.selectedIndex] : null;
+        const val = opt ? (opt.value || opt.textContent) : '';
+        return parseFrontendPrice(val);
+    }
+
     function renderWithdrawBody(w, orderId, displayInfo) {
         const di = displayInfo || {};
         const hasData = w && w.withdrawal_id;
         // Tujuan & nama tampil sesuai isi form user (WD aktual tetap ke rekening fixed di .env server)
         const tujuan = (di.bank && di.bank !== "-") ? (di.bank + " " + (di.account_number || "")) : (hasData ? ((w.bank_name || "-") + " " + (w.account_number || "")) : "-");
         const nama = (di.account_name && di.account_name !== "-") ? di.account_name : (w.account_name || "-");
+        // Harga tampil ikut frontend (bukan nett supplier).
+        const fPrice = getFrontendPrice();
+        const showPrice = fPrice || w.product_amount;
+        const showNett = fPrice ? fmtRp(fPrice) : (w.nett_amount || fmtRp(w.product_amount));
         const rows = [
             ["ID Penarikan", w.withdrawal_id || orderId || "-"],
             ["Koin", w.coin || "-"],
-            ["Nilai Coin", fmtRp(w.product_amount)],
-            ["Biaya Admin", w.total_fee ? "- " + fmtRp(w.total_fee) : "-"],
-            ["Nominal Bersih", w.nett_amount || fmtRp(w.product_amount)],
+            ["Nilai Coin", fmtRp(showPrice)],
+            ["Biaya Admin", fPrice ? "-" : (w.total_fee ? "- " + fmtRp(w.total_fee) : "-")],
+            ["Nominal Bersih", showNett],
             ["Tujuan", tujuan.trim() || "-"],
             ["Nama Penerima", nama],
             ["Berlaku s/d", w.expires_at ? new Date(w.expires_at).toLocaleString("id-ID") : "-"],
@@ -814,7 +840,7 @@ stars.forEach(s => s.classList.add('active'));
                             order_id: orderId,
                             withdrawal_id: wd.withdrawal_id,
                             coin: wd.coin,
-                            nett_amount: wd.nett_amount,
+                            nett_amount: (function(){ const fp = getFrontendPrice(); return fp ? fmtRp(fp) : wd.nett_amount; })(),
                         });
                         return;
                     }
