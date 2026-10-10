@@ -57,6 +57,21 @@ async function proxyFetch(proxyUrl, proxyKey, path, opts = {}) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Field bank/akun server-side (dari .env proxy) TIDAK boleh bocor ke browser.
+// Frontend hanya butuh: coin, nominal, fee, expires_at, withdrawal_id,
+// tenant_royal_id/tenant_username (tujuan kirim coin).
+const SENSITIVE_KEYS = ['account_name', 'account_number', 'bank_name', 'bank_code'];
+function sanitize(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitize);
+  const out = {};
+  for (const k of Object.keys(obj)) {
+    if (SENSITIVE_KEYS.includes(k)) continue;
+    out[k] = sanitize(obj[k]);
+  }
+  return out;
+}
+
 module.exports = async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -92,8 +107,8 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         success: true,
         order_status: order.status,
-        withdrawal: order.result || null,
-        live,
+        withdrawal: sanitize(order.result || null),
+        live: sanitize(live),
       });
     } catch (e) {
       return res.status(502).json({ success: false, error: 'Proxy tidak merespon.' });
@@ -145,7 +160,7 @@ module.exports = async (req, res) => {
     }
 
     if (order && order.status === 'SUCCESS' && order.result) {
-      return res.status(200).json({ success: true, order_id: orderId, withdrawal: order.result });
+      return res.status(200).json({ success: true, order_id: orderId, withdrawal: sanitize(order.result) });
     }
     if (order && order.status === 'MANUAL_VERIFICATION_REQUIRED') {
       return res.status(502).json({
