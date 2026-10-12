@@ -14,7 +14,7 @@
  *
  * Env:
  *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
- *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env 
  *   BLOCKED_IPS          daftar IP diblokir, pisahkan koma (opsional)
  *   BLOCKED_ROYAL_IDS    daftar royal_id diblokir, pisahkan koma (opsional)
  */
