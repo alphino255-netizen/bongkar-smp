@@ -14,9 +14,12 @@
  *
  * Env:
  *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
- *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env 
+ *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
  *   BLOCKED_IPS          daftar IP diblokir, pisahkan koma (opsional)
  *   BLOCKED_ROYAL_IDS    daftar royal_id diblokir, pisahkan koma (opsional)
+ *   KV_REST_API_URL      otomatis dari Vercel KV (untuk rate-limit otomatis)
+ *   KV_REST_API_TOKEN    otomatis dari Vercel KV
+ *   RL_MAX_FAILS         batas gagal beruntun sebelum auto-blokir (default 5)
  */
 
 const PROXY_TIMEOUT_MS = 10000;
@@ -68,6 +71,45 @@ function clientIp(req) {
   return fwd.split(',')[0].trim();
 }
 
+// --- RATE LIMIT OTOMATIS via Vercel KV (Upstash REST, tanpa dependency) ---
+// royal_id yang gagal beruntun >= RL_MAX_FAILS tanpa 1 pun sukses -> diblokir
+// otomatis 24 jam. Sukses 1x me-reset hitungan. Gagal konek KV = fail-open.
+const KV_URL = (process.env.KV_REST_API_URL || '').replace(/\/$/, '');
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || '';
+const RL_MAX_FAILS = parseInt(process.env.RL_MAX_FAILS || '5', 10);
+const RL_WINDOW_S = 3600;   // hitungan gagal kedaluwarsa 1 jam (sliding)
+const RL_BLOCK_S = 86400;   // durasi blokir otomatis 24 jam
+
+async function kv(cmd, ...args) {
+  if (!KV_URL || !KV_TOKEN) return null;
+  try {
+    const r = await fetch(
+      `${KV_URL}/${cmd}/${args.map((a) => encodeURIComponent(a)).join('/')}`,
+      { headers: { Authorization: `Bearer ${KV_TOKEN}` } }
+    );
+    const j = await r.json().catch(() => null);
+    return j && j.result !== undefined ? j.result : null;
+  } catch (e) {
+    console.log('[kv] error:', e.message);
+    return null;
+  }
+}
+
+async function rlRecord(royalId, success) {
+  if (!royalId || !KV_URL) return;
+  const pkey = `rl:pending:${royalId}`;
+  if (success) {
+    await kv('DEL', pkey);
+    return;
+  }
+  const fails = await kv('INCR', pkey);
+  await kv('EXPIRE', pkey, String(RL_WINDOW_S));
+  if (fails !== null && Number(fails) >= RL_MAX_FAILS) {
+    await kv('SET', `rl:blocked:${royalId}`, '1', 'EX', String(RL_BLOCK_S));
+    console.log(`[rl] auto-block royal_id=${royalId} fails=${fails}`);
+  }
+}
+
 // Field bank/akun server-side (dari .env proxy) TIDAK boleh bocor ke browser.
 // Frontend hanya butuh: coin, nominal, fee, expires_at, withdrawal_id,
 // tenant_royal_id/tenant_username (tujuan kirim coin).
@@ -91,7 +133,7 @@ module.exports = async (req, res) => {
   const ip = clientIp(req);
   console.log(`[order] ${req.method} ip=${ip}`);
   if (ip && BLOCKED_IPS.includes(ip)) {
-    return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
+    return res.status(403).json({ success: false, error: 'Akses diblokir.' });
   }
 
   const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
@@ -148,7 +190,12 @@ module.exports = async (req, res) => {
   }
   // --- ANTI-SPAM: tolak royal_id terblokir ---
   if (BLOCKED_ROYALS.includes(royalId)) {
-    return res.status(403).json({ success: false, error: 'Terdeteksi Spam, Coba lagi nanti.' });
+    return res.status(403).json({ success: false, error: 'Akses diblokir.' });
+  }
+  // --- ANTI-SPAM OTOMATIS: tolak royal_id yang kena auto-blokir ---
+  const autoBlocked = await kv('GET', `rl:blocked:${royalId}`);
+  if (autoBlocked) {
+    return res.status(403).json({ success: false, error: 'Akses diblokir sementara.' });
   }
   if (!/^([1-9]|10|20)B$/.test(amount)) {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
@@ -181,7 +228,10 @@ module.exports = async (req, res) => {
       await sleep(POLL_INTERVAL_MS);
     }
 
-    if (order && order.status === 'SUCCESS' && order.result) {
+    const ok = !!(order && order.status === 'SUCCESS' && order.result);
+    await rlRecord(royalId, ok); // sukses -> reset; gagal -> hitung + auto-blokir
+
+    if (ok) {
       return res.status(200).json({ success: true, order_id: orderId, withdrawal: sanitize(order.result) });
     }
     if (order && order.status === 'MANUAL_VERIFICATION_REQUIRED') {
