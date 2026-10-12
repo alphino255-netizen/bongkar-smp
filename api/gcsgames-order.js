@@ -25,7 +25,7 @@
 const PROXY_TIMEOUT_MS = 10000;
 const POLL_INTERVAL_MS = 1000;
 const POLL_BUDGET_MS = 50000;
-
+ 
 const ALLOWED_ORIGINS = [
   'https://neoparty.web.id',
   'http://localhost:3000',
