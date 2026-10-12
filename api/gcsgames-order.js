@@ -91,7 +91,7 @@ module.exports = async (req, res) => {
   const ip = clientIp(req);
   console.log(`[order] ${req.method} ip=${ip}`);
   if (ip && BLOCKED_IPS.includes(ip)) {
-    return res.status(403).json({ success: false, error: 'Gagal, Coba lagi nanti.' });
+    return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
   }
 
   const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
@@ -148,7 +148,7 @@ module.exports = async (req, res) => {
   }
   // --- ANTI-SPAM: tolak royal_id terblokir ---
   if (BLOCKED_ROYALS.includes(royalId)) {
-    return res.status(403).json({ success: false, error: 'Gagal, Coba lagi nanti.' });
+    return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
   }
   if (!/^([1-9]|10|20)B$/.test(amount)) {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
