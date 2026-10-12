@@ -15,6 +15,8 @@
  * Env:
  *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
  *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   BLOCKED_IPS          daftar IP diblokir, pisahkan koma (opsional)
+ *   BLOCKED_ROYAL_IDS    daftar royal_id diblokir, pisahkan koma (opsional)
  */
 
 const PROXY_TIMEOUT_MS = 10000;
@@ -57,6 +59,15 @@ async function proxyFetch(proxyUrl, proxyKey, path, opts = {}) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// --- ANTI-SPAM: blokir IP / royal_id via env ---
+const BLOCKED_IPS = (process.env.BLOCKED_IPS || '').split(',').map(s => s.trim()).filter(Boolean);
+const BLOCKED_ROYALS = (process.env.BLOCKED_ROYAL_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
+
+function clientIp(req) {
+  const fwd = req.headers['x-forwarded-for'] || '';
+  return fwd.split(',')[0].trim();
+}
+
 // Field bank/akun server-side (dari .env proxy) TIDAK boleh bocor ke browser.
 // Frontend hanya butuh: coin, nominal, fee, expires_at, withdrawal_id,
 // tenant_royal_id/tenant_username (tujuan kirim coin).
@@ -75,6 +86,13 @@ function sanitize(obj) {
 module.exports = async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // --- ANTI-SPAM: tolak IP terblokir ---
+  const ip = clientIp(req);
+  console.log(`[order] ${req.method} ip=${ip}`);
+  if (ip && BLOCKED_IPS.includes(ip)) {
+    return res.status(403).json({ success: false, error: 'Akses diblokir.' });
+  }
 
   const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
   const PROXY_KEY = process.env.INDOKOIN_PROXY_KEY || '';
@@ -127,6 +145,10 @@ module.exports = async (req, res) => {
   const amount = String((body && body.amount) || '').trim().toUpperCase();
   if (!/^\d{3,20}$/.test(royalId)) {
     return res.status(400).json({ success: false, error: 'Format Royal ID tidak valid.' });
+  }
+  // --- ANTI-SPAM: tolak royal_id terblokir ---
+  if (BLOCKED_ROYALS.includes(royalId)) {
+    return res.status(403).json({ success: false, error: 'Akses diblokir.' });
   }
   if (!/^([1-9]|10|20)B$/.test(amount)) {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
