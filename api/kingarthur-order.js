@@ -1,20 +1,20 @@
 /**
- * Vercel Serverless Function: Indokoin withdraw proxy (forwarder).
+ * Vercel Serverless Function: King Arthur withdraw proxy (forwarder).
  *
- * Supplier: https://cuan.indokoinstore.com (tenant 444666 / INDOKOIN)
+ * Supplier: https://cuan.royalkingarthur.id (tenant 10101010 / MERLIN)
  * API-nya identik dengan zenithplay — beda SUPPLIER_BASE saja.
  *
- * POST /api/indokoin-order { royal_id, amount }
+ * POST /api/kingarthur-order { royal_id, amount }
  *   1. submit async ke proxy  -> POST /api/withdraw      => { order_id }
  *   2. polling status          -> GET  /api/withdraw/:id  sampai terminal
  *   3. kembalikan data withdrawal ke frontend.
  *
- * GET /api/indokoin-order?order_id=xxx
+ * GET /api/kingarthur-order?order_id=xxx
  *   -> live status dari supplier (untuk polling popup frontend)
  *
  * Env:
- *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
- *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   KINGARTHUR_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
+ *   KINGARTHUR_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
  */
 
 const PROXY_TIMEOUT_MS = 10000;
@@ -23,6 +23,9 @@ const POLL_BUDGET_MS = 50000;
 
 const ALLOWED_ORIGINS = [
   'https://neoparty.web.id',
+  'https://indokoinstore.shop',
+  'https://cuan.indokoinstore.shop',
+  'https://indokar.vercel.app',
   'http://localhost:3000',
   'http://localhost:5173',
 ];
@@ -57,36 +60,38 @@ async function proxyFetch(proxyUrl, proxyKey, path, opts = {}) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Field bank/akun server-side (dari .env proxy) TIDAK boleh bocor ke browser.
-// Frontend hanya butuh: coin, nominal, fee, expires_at, withdrawal_id,
-// tenant_royal_id/tenant_username (tujuan kirim coin).
-const SENSITIVE_KEYS = ['account_name', 'account_number', 'bank_name', 'bank_code'];
-function sanitize(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(sanitize);
-  const out = {};
-  for (const k of Object.keys(obj)) {
-    if (SENSITIVE_KEYS.includes(k)) continue;
-    out[k] = sanitize(obj[k]);
-  }
-  return out;
-}
-
 module.exports = async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
-  const PROXY_KEY = process.env.INDOKOIN_PROXY_KEY || '';
+  const PROXY_URL = (process.env.KINGARTHUR_PROXY_URL || '').replace(/\/$/, '');
+  const PROXY_KEY = process.env.KINGARTHUR_PROXY_KEY || '';
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Proxy belum dikonfigurasi (INDOKOIN_PROXY_URL / INDOKOIN_PROXY_KEY).',
+      error: 'Proxy belum dikonfigurasi (KINGARTHUR_PROXY_URL / KINGARTHUR_PROXY_KEY).',
     });
   }
 
   // ---- GET: live status untuk polling popup ----
   if (req.method === 'GET') {
+    // ---- action=health: status supplier untuk banner maintenance di frontend ----
+    // Dipakai index.html polling tiap 60 detik. Kalau supplier bukan READY
+    // (maintenance / error / proxy mati), frontend otomatis tampilkan mode maintenance.
+    const action = String((req.query && req.query.action) || '').trim();
+    if (action === 'health') {
+      try {
+        const h = await proxyFetch(PROXY_URL, PROXY_KEY, '/health');
+        const supplier = String((h.data && h.data.supplier) || 'UNKNOWN').toUpperCase();
+        return res.status(200).json({ success: true, supplier });
+      } catch (e) {
+        return res.status(502).json({
+          success: false, supplier: 'PROXY_DOWN',
+          error: 'Proxy tidak merespon.',
+        });
+      }
+    }
+
     const orderId = String((req.query && req.query.order_id) || '').trim();
     if (!orderId) {
       return res.status(400).json({ success: false, error: 'order_id wajib.' });
@@ -107,8 +112,8 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         success: true,
         order_status: order.status,
-        withdrawal: sanitize(order.result || null),
-        live: sanitize(live),
+        withdrawal: order.result || null,
+        live,
       });
     } catch (e) {
       return res.status(502).json({ success: false, error: 'Proxy tidak merespon.' });
@@ -160,7 +165,7 @@ module.exports = async (req, res) => {
     }
 
     if (order && order.status === 'SUCCESS' && order.result) {
-      return res.status(200).json({ success: true, order_id: orderId, withdrawal: sanitize(order.result) });
+      return res.status(200).json({ success: true, order_id: orderId, withdrawal: order.result });
     }
     if (order && order.status === 'MANUAL_VERIFICATION_REQUIRED') {
       return res.status(502).json({
