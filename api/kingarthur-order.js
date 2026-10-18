@@ -15,7 +15,11 @@
  * Env:
  *   KINGARTHUR_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
  *   KINGARTHUR_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   ID_CHECK_ENABLED       '0' untuk mematikan cek ID player (default nyala)
+ *   NEO_CHECK_SIG          override signature cek ID (default bawaan neoparty)
  */
+
+const crypto = require('crypto');
 
 const PROXY_TIMEOUT_MS = 10000;
 const POLL_INTERVAL_MS = 1000;
@@ -59,6 +63,43 @@ async function proxyFetch(proxyUrl, proxyKey, path, opts = {}) {
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// --- CEK ID PLAYER via endpoint neoparty (sebelum order diteruskan ke proxy) ---
+// GET https://neo-ack.theneoparty.com/agent_recharge/order/info?player_id=X&product_id=1
+// header Signature: MD5("player_id=X&product_id=1&signature={SIG}")
+// En=0 + Data -> valid | En=656/182 -> ID tidak ada | selain itu -> fail-open (lanjut seperti biasa)
+const ID_CHECK_ENABLED = (process.env.ID_CHECK_ENABLED || '1') !== '0';
+const ID_CHECK_SIG = process.env.NEO_CHECK_SIG || '7d83ac6f236288c720d7f4f4109a0776';
+const ID_CHECK_TIMEOUT_MS = 8000;
+
+async function checkPlayerId(playerId) {
+  try {
+    const sig = crypto.createHash('md5')
+      .update(`player_id=${playerId}&product_id=1&signature=${ID_CHECK_SIG}`)
+      .digest('hex');
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ID_CHECK_TIMEOUT_MS);
+    let res;
+    try {
+      res = await fetch(
+        `https://neo-ack.theneoparty.com/agent_recharge/order/info` +
+        `?player_id=${encodeURIComponent(playerId)}&product_id=1`,
+        { headers: { 'Accept': 'application/json', 'Signature': sig }, signal: ctrl.signal }
+      );
+    } finally {
+      clearTimeout(t);
+    }
+    const m = await res.json().catch(() => null);
+    if (!m || typeof m.En === 'undefined') return null; // tidak tahu -> fail-open
+    if (m.En === 0 && m.Data) return true;
+    if (m.En === 656 || m.En === 182) return false;
+    console.log(`[idcheck] unexpected En=${m.En} untuk ${playerId} -> fail-open`);
+    return null;
+  } catch (e) {
+    console.log('[idcheck] error:', e.message, '-> fail-open');
+    return null;
+  }
+}
 
 module.exports = async (req, res) => {
   cors(req, res);
@@ -135,6 +176,14 @@ module.exports = async (req, res) => {
   }
   if (!/^([1-9]|10|20)B$/.test(amount)) {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
+  }
+
+  // --- CEK ID PLAYER: tolak ID yang tidak terdaftar di game ---
+  if (ID_CHECK_ENABLED) {
+    const chk = await checkPlayerId(royalId);
+    if (chk === false) {
+      return res.status(400).json({ success: false, error: 'Error, ID akun anda tidak valid' });
+    }
   }
 
   try {
