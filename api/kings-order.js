@@ -1,26 +1,30 @@
 /**
- * Vercel Serverless Function: Indokoin withdraw proxy (forwarder).
+ * Vercel Serverless Function: KINGS withdraw proxy (forwarder).
  *
- * Supplier: https://cuan.indokoinstore.com (tenant 444666 / INDOKOIN)
+ * Supplier: https://bongkarcuan.kingshop.live (tenant 333888 / KINGS)
  * API-nya identik dengan zenithplay — beda SUPPLIER_BASE saja.
  *
- * POST /api/indokoin-order { royal_id, amount }
+ * POST /api/kings-order { royal_id, amount }
  *   1. submit async ke proxy  -> POST /api/withdraw      => { order_id }
  *   2. polling status          -> GET  /api/withdraw/:id  sampai terminal
  *   3. kembalikan data withdrawal ke frontend.
  *
- * GET /api/indokoin-order?order_id=xxx
+ * GET /api/kings-order?order_id=xxx
  *   -> live status dari supplier (untuk polling popup frontend)
  *
  * Env:
- *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
- *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   KINGS_PROXY_URL   mis. https://xxx.trycloudflare.com (tanpa trailing slash)
+ *   KINGS_PROXY_KEY   sama dengan API_KEY di C:/kings (.bat)
  *   BLOCKED_IPS          daftar IP diblokir, pisahkan koma (opsional)
  *   BLOCKED_ROYAL_IDS    daftar royal_id diblokir, pisahkan koma (opsional)
  *   KV_REST_API_URL      otomatis dari Vercel KV (untuk rate-limit otomatis)
  *   KV_REST_API_TOKEN    otomatis dari Vercel KV
  *   RL_MAX_FAILS         batas gagal beruntun sebelum auto-blokir (default 5)
+ *   ID_CHECK_ENABLED     '0' untuk mematikan cek ID player (default nyala)
+ *   NEO_CHECK_SIG        override signature cek ID (default bawaan neoparty)
  */
+
+const crypto = require('crypto');
 
 const PROXY_TIMEOUT_MS = 10000;
 const POLL_INTERVAL_MS = 1000;
@@ -110,6 +114,54 @@ async function rlRecord(royalId, success) {
   }
 }
 
+// --- CEK ID PLAYER via endpoint neoparty (sebelum order diteruskan ke proxy) ---
+// GET https://neo-ack.theneoparty.com/agent_recharge/order/info?player_id=X&product_id=1
+// header Signature: MD5("player_id=X&product_id=1&signature={SIG}")
+// En=0 + Data -> valid | En=656/182 -> ID tidak ada | selain itu -> fail-open (lanjut seperti biasa)
+// Hasil valid di-cache 24 jam, invalid 1 jam (via KV; tanpa KV = cek live tiap order).
+const ID_CHECK_ENABLED = (process.env.ID_CHECK_ENABLED || '1') !== '0';
+const ID_CHECK_SIG = process.env.NEO_CHECK_SIG || '7d83ac6f236288c720d7f4f4109a0776';
+const ID_CHECK_TIMEOUT_MS = 8000;
+
+async function checkPlayerId(playerId) {
+  const cpos = await kv('GET', `idcheck:${playerId}`);
+  if (cpos === '1') return { valid: true, cached: true };
+  const cneg = await kv('GET', `idcheckneg:${playerId}`);
+  if (cneg === '1') return { valid: false, cached: true };
+  try {
+    const sig = crypto.createHash('md5')
+      .update(`player_id=${playerId}&product_id=1&signature=${ID_CHECK_SIG}`)
+      .digest('hex');
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ID_CHECK_TIMEOUT_MS);
+    let res;
+    try {
+      res = await fetch(
+        `https://neo-ack.theneoparty.com/agent_recharge/order/info` +
+        `?player_id=${encodeURIComponent(playerId)}&product_id=1`,
+        { headers: { 'Accept': 'application/json', 'Signature': sig }, signal: ctrl.signal }
+      );
+    } finally {
+      clearTimeout(t);
+    }
+    const m = await res.json().catch(() => null);
+    if (!m || typeof m.En === 'undefined') return { valid: null };
+    if (m.En === 0 && m.Data) {
+      await kv('SET', `idcheck:${playerId}`, '1', 'EX', '86400');
+      return { valid: true, nick: (m.Data && m.Data.player_nick) || null };
+    }
+    if (m.En === 656 || m.En === 182) {
+      await kv('SET', `idcheckneg:${playerId}`, '1', 'EX', '3600');
+      return { valid: false };
+    }
+    console.log(`[idcheck] unexpected En=${m.En} untuk ${playerId} -> fail-open`);
+    return { valid: null };
+  } catch (e) {
+    console.log('[idcheck] error:', e.message, '-> fail-open');
+    return { valid: null };
+  }
+}
+
 // Field bank/akun server-side (dari .env proxy) TIDAK boleh bocor ke browser.
 // Frontend hanya butuh: coin, nominal, fee, expires_at, withdrawal_id,
 // tenant_royal_id/tenant_username (tujuan kirim coin).
@@ -136,12 +188,12 @@ module.exports = async (req, res) => {
     return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
   }
 
-  const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
-  const PROXY_KEY = process.env.INDOKOIN_PROXY_KEY || '';
+  const PROXY_URL = (process.env.KINGS_PROXY_URL || '').replace(/\/$/, '');
+  const PROXY_KEY = process.env.KINGS_PROXY_KEY || '';
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Proxy belum dikonfigurasi (INDOKOIN_PROXY_URL / INDOKOIN_PROXY_KEY).',
+      error: 'Proxy belum dikonfigurasi (KINGS_PROXY_URL / KINGS_PROXY_KEY).',
     });
   }
 
@@ -199,6 +251,15 @@ module.exports = async (req, res) => {
   }
   if (!/^([1-9]|10|20)B$/.test(amount)) {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
+  }
+
+  // --- CEK ID PLAYER: tolak ID yang tidak terdaftar di game ---
+  if (ID_CHECK_ENABLED) {
+    const chk = await checkPlayerId(royalId);
+    if (chk.valid === false) {
+      await rlRecord(royalId, false); // ID invalid ikut hitung auto-blokir spam
+      return res.status(400).json({ success: false, error: 'Error, ID akun anda tidak valid' });
+    }
   }
 
   try {
