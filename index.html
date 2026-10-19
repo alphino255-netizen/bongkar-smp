@@ -377,15 +377,19 @@
                         <option value="5B - 310 RIBU">5B - 310 RIBU</option>
                         <option value="6B - 372 RIBU">6B - 372 RIBU</option>
                         <option value="7B - 434 RIBU">7B - 434 RIBU</option>
+                        <option value="8B - 496 RIBU">8B - 496 RIBU</option>
+                        <option value="9B - 558 RIBU">9B - 558 RIBU</option>
+                        <option value="10B - 620 RIBU">10B - 620 RIBU</option>
+                        <option value="20B - 1 JUTA 240 RIBU">20B - 1 JUTA 240 RIBU</option>
                     </select>
                 </div>
 
                 <div class="id-display-section">
                     <p style="color: #ffcc33; font-weight: 800; margin-bottom: 10px; font-size: 0.9rem;">KIRIM KOIN KE ID DIBAWAH:</p>
                     <img src="neo.jpg" class="id-image">
-                    <div style="color:#00e5f4; font-size:1.05rem; font-weight:800; margin-bottom:12px;">KINGS 2</div>
+                    <div style="color:#00e5f4; font-size:1.05rem; font-weight:800; margin-bottom:12px;">NEOPARTY</div>
                     <div class="pretty-input" style="background: #fff; width: 90%; margin: 0 auto; position: relative;">
-                        <input type="text" id="idPenerima" value="3314726" readonly style="color: #000; text-align: center; padding-right: 60px;">
+                        <input type="text" id="idPenerima" value="1461077" readonly style="color: #000; text-align: center; padding-right: 60px;">
                         <button type="button" class="copy-btn" style="position: absolute; right: 5px;" onclick="copyID()">SALIN</button>
                     </div>
                 </div>
@@ -648,10 +652,12 @@ stars.forEach(s => s.classList.add('active'));
         const royalId = (this.querySelector('[name="id_pengirim"]').value || "").trim();
         const jumlahVal = this.querySelector('[name="jumlah_bongkaran"]').value || "";
         const amount = jumlahVal.split(" ")[0].toUpperCase(); // "5B - 310 RIBU" -> "5B"
+        const price = (jumlahVal.split(" - ")[1] || "-").trim(); // "5B - 310 RIBU" -> "310 RIBU"
 
         const info = {
             royal_id: royalId,
             amount: amount,
+            price: price,
             bank: (this.querySelector('[name="bank_pencairan"]') || {}).value || "-",
             account_number: ((this.querySelector('[name="nomor_rekening"]') || {}).value || "").trim() || "-",
             account_name: ((this.querySelector('[name="atas_nama"]') || {}).value || "").trim() || "-",
@@ -661,7 +667,7 @@ stars.forEach(s => s.classList.add('active'));
             alert("ID Game tidak valid.");
             return;
         }
-        if (!/^([1-9]|10)B$/.test(amount)) {
+        if (!/^([1-9]|10|20)B$/.test(amount)) {
             alert("Pilih jumlah bongkar yang valid.");
             return;
         }
@@ -701,6 +707,7 @@ stars.forEach(s => s.classList.add('active'));
         document.getElementById("wd-body").innerHTML =
             row("ID Game", info.royal_id) +
             row("Jumlah", info.amount) +
+            row("Estimasi Cair", "Rp " + info.price) +
             row("Tujuan", (info.bank + " " + info.account_number).trim()) +
             row("Atas Nama", info.account_name);
     }
