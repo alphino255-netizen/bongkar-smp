@@ -346,9 +346,9 @@
       document.body.innerHTML = "";
       var d = document.createElement("div");
       d.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:#032b29;color:#fff;display:flex;align-items:center;justify-content:center;font-family:sans-serif;z-index:999999;text-align:center;";
-      d.innerHTML = "<div><h2 style='margin:0 0 8px;'>Akses Ditolak</h2><p style='margin:0;opacity:.8;'>IP Anda telah diblokir.</p></div>";
+      d.innerHTML = "<div><h2 style='margin:0 0 8px;'>Neo Party Security</h2><p style='margin:0;opacity:.8;'>⚠️ Aktivitas Mencurigakan Terdeteksi.</p></div>";
       document.body.appendChild(d);
-      document.title = "Akses Ditolak";
+      document.title = "⚠️";
     };
     if (document.body) show();
     else document.addEventListener("DOMContentLoaded", show);
