@@ -14,7 +14,7 @@
 
 const ALLOWED_ORIGINS = [
   'https://neoparty.web.id',
-  'https://www.neoparty.web.id',
+  'https://www.neoparty.web.id', 
   'http://localhost:3000',
   'http://localhost:5173',
 ];
