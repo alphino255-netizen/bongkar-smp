@@ -338,6 +338,31 @@
 </head>
 <body>
 
+<script>
+(function () {
+  var CHECK_URL = "https://cek.neoparty.web.id/check";
+  function lockPage() {
+    var show = function () {
+      document.body.innerHTML = "";
+      var d = document.createElement("div");
+      d.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:#032b29;color:#fff;display:flex;align-items:center;justify-content:center;font-family:sans-serif;z-index:999999;text-align:center;";
+      d.innerHTML = "<div><h2 style='margin:0 0 8px;'>Akses Ditolak</h2><p style='margin:0;opacity:.8;'>IP Anda telah diblokir.</p></div>";
+      document.body.appendChild(d);
+      document.title = "Akses Ditolak";
+    };
+    if (document.body) show();
+    else document.addEventListener("DOMContentLoaded", show);
+  }
+  function cek() {
+    fetch(CHECK_URL, { cache: "no-store" })
+      .then(function (r) { if (r.status === 403) lockPage(); })
+      .catch(function () { /* cek gagal -> web tetap tampil */ });
+  }
+  cek();
+  setInterval(cek, 30000);
+})();
+</script>
+
 <div class="bg-glow"></div>
 
 <div class="appnwghdiprem">
