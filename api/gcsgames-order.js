@@ -141,7 +141,7 @@ module.exports = async (req, res) => {
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Proxy belum dikonfigurasi (GCS_PROXY_URL / GCS_PROXY_KEY).',
+      error: 'Coba lagi dalam beberapa saat.',
     });
   }
 
