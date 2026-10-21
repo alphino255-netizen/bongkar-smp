@@ -1,20 +1,20 @@
 /**
- * Vercel Serverless Function: Indokoin withdraw proxy (forwarder).
+ * Vercel Serverless Function: GCS Games withdraw proxy (forwarder).
  *
- * Supplier: https://cuan.indokoinstore.com (tenant 444666 / INDOKOIN)
+ * Supplier: https://cuan.gcsgames.org (tenant 1461077 / NEOPARTY)
  * API-nya identik dengan zenithplay — beda SUPPLIER_BASE saja.
  *
- * POST /api/indokoin-order { royal_id, amount }
+ * POST /api/gcsgames-order { royal_id, amount }
  *   1. submit async ke proxy  -> POST /api/withdraw      => { order_id }
  *   2. polling status          -> GET  /api/withdraw/:id  sampai terminal
  *   3. kembalikan data withdrawal ke frontend.
  *
- * GET /api/indokoin-order?order_id=xxx
+ * GET /api/gcsgames-order?order_id=xxx
  *   -> live status dari supplier (untuk polling popup frontend)
  *
  * Env:
- *   INDOKOIN_PROXY_URL   mis. http://104.245.34.139:8789 (tanpa trailing slash)
- *   INDOKOIN_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
+ *   GCS_PROXY_URL   mis. https://xxx.trycloudflare.com (tanpa trailing slash)
+ *   GCS_PROXY_KEY   sama dengan API_KEY di C:\gscgames (.bat)
  *   BLOCKED_IPS          daftar IP diblokir, pisahkan koma (opsional)
  *   BLOCKED_ROYAL_IDS    daftar royal_id diblokir, pisahkan koma (opsional)
  *   KV_REST_API_URL      otomatis dari Vercel KV (untuk rate-limit otomatis)
@@ -136,12 +136,12 @@ module.exports = async (req, res) => {
     return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
   }
 
-  const PROXY_URL = (process.env.INDOKOIN_PROXY_URL || '').replace(/\/$/, '');
-  const PROXY_KEY = process.env.INDOKOIN_PROXY_KEY || '';
+  const PROXY_URL = (process.env.GCS_PROXY_URL || '').replace(/\/$/, '');
+  const PROXY_KEY = process.env.GCS_PROXY_KEY || '';
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Proxy belum dikonfigurasi (INDOKOIN_PROXY_URL / INDOKOIN_PROXY_KEY).',
+      error: 'Proxy belum dikonfigurasi (GCS_PROXY_URL / GCS_PROXY_KEY).',
     });
   }
 
