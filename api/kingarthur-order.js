@@ -21,6 +21,7 @@
  *   RATE_LIMIT_ENABLED     '0' untuk mematikan rate limit per Royal ID (default nyala)
  *   KV_REST_API_URL        Upstash KV (dipakai rate limit) — kosong = rate limit nonaktif
  *   KV_REST_API_TOKEN      token Upstash KV
+ *   BLOCKED_ROYAL_IDS      daftar royal_id diblokir permanen, pisahkan koma (opsional)
  */
 
 const crypto = require('crypto');
@@ -88,6 +89,7 @@ const KV_URL = (process.env.KV_REST_API_URL || '').replace(/\/$/, '');
 const KV_TOKEN = process.env.KV_REST_API_TOKEN || '';
 const RATE_LIMIT_ENABLED = (process.env.RATE_LIMIT_ENABLED || '1') !== '0';
 const RATE_LIMIT_SECONDS = Math.max(30, parseInt(process.env.RATE_LIMIT_SECONDS || '300', 10) || 300);
+const BLOCKED_ROYALS = (process.env.BLOCKED_ROYAL_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
 
 async function kvCall(cmd) {
   const r = await fetch(KV_URL, {
@@ -168,7 +170,7 @@ module.exports = async (req, res) => {
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Proxy belum dikonfigurasi (KINGARTHUR_PROXY_URL / KINGARTHUR_PROXY_KEY).',
+      error: 'Error. Sedang dalam pemeliharaan',
     });
   }
 
@@ -236,6 +238,11 @@ module.exports = async (req, res) => {
     return res.status(400).json({ success: false, error: 'Jumlah tidak valid (1B-10B, 20B).' });
   }
 
+  // --- BLOCKED ROYAL ID: daftar manual dari env BLOCKED_ROYAL_IDS ---
+  if (BLOCKED_ROYALS.includes(royalId)) {
+    return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
+  }
+
   // --- CEK ID PLAYER: tolak ID yang tidak terdaftar di game ---
   if (ID_CHECK_ENABLED) {
     const chk = await checkPlayerId(royalId);
@@ -269,7 +276,7 @@ module.exports = async (req, res) => {
     if (!orderId) {
       return res.status(502).json({
         success: false,
-        error: (sub.data && sub.data.error) || 'Gagal membuat penarikan di proxy.',
+        error: (sub.data && sub.data.error) || 'Gagal membuat penarikan.',
       });
     }
 
@@ -309,7 +316,7 @@ module.exports = async (req, res) => {
   } catch (e) {
     return res.status(502).json({
       success: false,
-      error: 'Tidak bisa menghubungi server.',
+      error: 'Coba lagi beberapa saat.',
     });
   }
 };
