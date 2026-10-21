@@ -17,6 +17,10 @@
  *   KINGARTHUR_PROXY_KEY   sama dengan API_KEY di /opt/indokoin-withdraw/.env
  *   ID_CHECK_ENABLED       '0' untuk mematikan cek ID player (default nyala)
  *   NEO_CHECK_SIG          override signature cek ID (default bawaan neoparty)
+ *   RATE_LIMIT_SECONDS     jeda antar-order per Royal ID (default 300 = 5 menit)
+ *   RATE_LIMIT_ENABLED     '0' untuk mematikan rate limit per Royal ID (default nyala)
+ *   KV_REST_API_URL        Upstash KV (dipakai rate limit) — kosong = rate limit nonaktif
+ *   KV_REST_API_TOKEN      token Upstash KV
  */
 
 const crypto = require('crypto');
@@ -63,6 +67,60 @@ async function proxyFetch(proxyUrl, proxyKey, path, opts = {}) {
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// --- SANITIZE: data rekening pencairan TIDAK boleh bocor ke browser ---
+const SENSITIVE_KEYS = ['account_name', 'account_number', 'bank_name', 'bank_code'];
+function sanitize(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitize);
+  const out = {};
+  for (const k of Object.keys(obj)) {
+    if (SENSITIVE_KEYS.includes(k)) continue;
+    out[k] = sanitize(obj[k]);
+  }
+  return out;
+}
+
+// --- RATE LIMIT PER ROYAL ID: satu ID hanya boleh membuat order tiap RATE_LIMIT_SECONDS ---
+// Disimpan di Upstash KV (fungsi Vercel tidak punya ingatan antar-request).
+// KV kosong / error -> fail-open (order tetap jalan, tidak mengunci pelanggan).
+const KV_URL = (process.env.KV_REST_API_URL || '').replace(/\/$/, '');
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || '';
+const RATE_LIMIT_ENABLED = (process.env.RATE_LIMIT_ENABLED || '1') !== '0';
+const RATE_LIMIT_SECONDS = Math.max(30, parseInt(process.env.RATE_LIMIT_SECONDS || '300', 10) || 300);
+
+async function kvCall(cmd) {
+  const r = await fetch(KV_URL, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${KV_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(cmd),
+  });
+  if (!r.ok) throw new Error(`KV HTTP ${r.status}`);
+  const j = await r.json().catch(() => null);
+  if (!j || typeof j.result === 'undefined') throw new Error('KV respon tidak valid');
+  return j.result;
+}
+
+// returns: 'ok' (slot didapat) | 'exists' (masih dalam masa jeda) | 'skip' (KV mati/error)
+async function cooldownAcquire(key) {
+  if (!KV_URL || !KV_TOKEN) return 'skip';
+  try {
+    const result = await kvCall(['SET', key, '1', 'NX', 'EX', String(RATE_LIMIT_SECONDS)]);
+    return result === 'OK' ? 'ok' : 'exists';
+  } catch (e) {
+    console.log('[ratelimit] kv error:', e.message, '-> fail-open');
+    return 'skip';
+  }
+}
+
+async function cooldownTtl(key) {
+  try {
+    const t = await kvCall(['TTL', key]);
+    return (typeof t === 'number' && t > 0) ? t : null;
+  } catch (e) {
+    return null;
+  }
+}
 
 // --- CEK ID PLAYER via endpoint neoparty (sebelum order diteruskan ke proxy) ---
 // GET https://neo-ack.theneoparty.com/agent_recharge/order/info?player_id=X&product_id=1
@@ -153,8 +211,8 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         success: true,
         order_status: order.status,
-        withdrawal: order.result || null,
-        live,
+        withdrawal: sanitize(order.result || null),
+        live: sanitize(live),
       });
     } catch (e) {
       return res.status(502).json({ success: false, error: 'Proxy tidak merespon.' });
@@ -186,6 +244,22 @@ module.exports = async (req, res) => {
     }
   }
 
+  // --- RATE LIMIT PER ROYAL ID: cegah order beruntun dari ID yang sama ---
+  // Hanya pembuatan order (POST) yang dibatasi; polling GET tidak kena.
+  if (RATE_LIMIT_ENABLED) {
+    const cdKey = `cd:kingarthur:id:${royalId}`;
+    if ((await cooldownAcquire(cdKey)) === 'exists') {
+      const ttl = await cooldownTtl(cdKey);
+      const sisa = ttl
+        ? (ttl >= 90 ? `±${Math.ceil(ttl / 60)} menit` : `${ttl} detik`)
+        : 'beberapa menit';
+      return res.status(429).json({
+        success: false,
+        error: `Terlalu cepat. ID ini baru saja membuat order — coba lagi dalam ${sisa}.`,
+      });
+    }
+  }
+
   try {
     const sub = await proxyFetch(PROXY_URL, PROXY_KEY, '/api/withdraw', {
       method: 'POST',
@@ -214,12 +288,12 @@ module.exports = async (req, res) => {
     }
 
     if (order && order.status === 'SUCCESS' && order.result) {
-      return res.status(200).json({ success: true, order_id: orderId, withdrawal: order.result });
+      return res.status(200).json({ success: true, order_id: orderId, withdrawal: sanitize(order.result) });
     }
     if (order && order.status === 'MANUAL_VERIFICATION_REQUIRED') {
       return res.status(502).json({
         success: false, order_id: orderId,
-        error: 'Supplier butuh verifikasi manual. Coba lagi beberapa saat.',
+        error: 'Coba lagi beberapa saat.',
       });
     }
     if (order && ['FAILED', 'BROWSER_ERROR', 'SUPPLIER_ERROR'].includes(order.status)) {
@@ -235,7 +309,7 @@ module.exports = async (req, res) => {
   } catch (e) {
     return res.status(502).json({
       success: false,
-      error: 'Tidak bisa menghubungi proxy withdraw. Pastikan service proxy jalan.',
+      error: 'Tidak bisa menghubungi server.',
     });
   }
 };
