@@ -22,6 +22,8 @@
  *   KV_REST_API_URL        Upstash KV (dipakai rate limit) — kosong = rate limit nonaktif
  *   KV_REST_API_TOKEN      token Upstash KV
  *   BLOCKED_ROYAL_IDS      daftar royal_id diblokir permanen, pisahkan koma (opsional)
+ *   BALANCE_CHECK_ENABLED  '0' untuk mematikan cek saldo koin (default nyala)
+ *   BALANCE_API_URL        override API cek saldo (default hidupcuan personal-info-free)
  */
 
 const crypto = require('crypto');
@@ -124,6 +126,118 @@ async function cooldownTtl(key) {
   }
 }
 
+async function kvGet(key) {
+  if (!KV_URL || !KV_TOKEN) return null;
+  try {
+    const v = await kvCall(['GET', key]);
+    return (typeof v === 'string') ? v : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function kvSetEx(key, value, seconds) {
+  if (!KV_URL || !KV_TOKEN) return;
+  try { await kvCall(['SET', key, value, 'EX', String(seconds)]); } catch (e) {}
+}
+
+async function kvDel(key) {
+  if (!KV_URL || !KV_TOKEN) return;
+  try { await kvCall(['DEL', key]); } catch (e) {}
+}
+
+// --- CEK SALDO KOIN via hidupcuan (sebelum order diteruskan ke proxy) ---
+// Syarat bongkar: Coin >= nominal x 1,02 + 500.000.000 (endapan wajib 500M + fee 2%).
+// Di bawah syarat -> ditolak 'Koin bongkar kurang'. API error -> fail-open
+// (bukan salah pelanggan), sama seperti cek ID.
+const BALANCE_CHECK_ENABLED = (process.env.BALANCE_CHECK_ENABLED || '1') !== '0';
+const BALANCE_API_URL = process.env.BALANCE_API_URL || 'https://api.hidupcuan.org/api/neo/personal-info-free';
+const BALANCE_TIMEOUT_MS = 6000;
+const RESERVE_COINS = 500000000;
+
+function requiredCoins(amountKey) {
+  const n = parseInt(amountKey, 10);
+  if (isNaN(n)) return null;
+  return Math.floor((n * 1000000000) * 102 / 100) + RESERVE_COINS;
+}
+
+// returns: { ok, coin, required, nick } | null (tidak tahu -> fail-open)
+async function checkCoinBalance(royalId, amountKey) {
+  const required = requiredCoins(amountKey);
+  if (required === null) return null;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), BALANCE_TIMEOUT_MS);
+    let res;
+    try {
+      res = await fetch(BALANCE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ id: Number(royalId) }),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(t);
+    }
+    const m = await res.json().catch(() => null);
+    if (!m || m.status !== 'success' || !m.data || typeof m.data.Coin === 'undefined') return null;
+    const coin = Number(m.data.Coin);
+    if (!isFinite(coin)) return null;
+    return { ok: coin >= required, coin, required, nick: m.data.Nick || null };
+  } catch (e) {
+    console.log('[balance] error:', e.message, '-> fail-open');
+    return null;
+  }
+}
+
+// --- LOCK PENDING per Royal ID (10 menit, disimpan di KV) ---
+// Order yang masih pending mengunci ID-nya: submit ulang mengembalikan
+// order_id lama + sisa waktu; halaman menampilkan lagi bongkar pertamanya.
+// Lock lepas saat order lama terminal (proxy/live supplier) atau TTL habis.
+const LOCK_TTL_SECONDS = 600;
+const lockKey = (royalId) => `lock:kingarthur:id:${royalId}`;
+const lockOrderKey = (orderId) => `lock:kingarthur:order:${orderId}`;
+
+async function readLock(royalId) {
+  const raw = await kvGet(lockKey(royalId));
+  if (!raw) return null;
+  try {
+    const o = JSON.parse(raw);
+    return (o && o.order_id) ? o : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function writeLock(royalId, orderId) {
+  const exp = Date.now() + LOCK_TTL_SECONDS * 1000;
+  await kvSetEx(lockKey(royalId), JSON.stringify({ order_id: orderId, expires_at: exp }), LOCK_TTL_SECONDS);
+  await kvSetEx(lockOrderKey(orderId), String(royalId), LOCK_TTL_SECONDS);
+}
+
+async function clearLock(royalId, orderId) {
+  await kvDel(lockKey(royalId));
+  if (orderId) await kvDel(lockOrderKey(orderId));
+}
+
+// true bila order lama masih pending (belum terminal di proxy / live supplier)
+async function orderStillPending(proxyUrl, proxyKey, orderId) {
+  try {
+    const g = await proxyFetch(proxyUrl, proxyKey, `/api/withdraw/${encodeURIComponent(orderId)}`);
+    const o = g.data && g.data.order;
+    if (!o) return false;
+    if (['FAILED', 'MANUAL_VERIFICATION_REQUIRED', 'BROWSER_ERROR', 'SUPPLIER_ERROR'].includes(o.status)) return false;
+    if (o.status === 'SUCCESS' && o.result && o.result.withdrawal_id) {
+      const s = await proxyFetch(proxyUrl, proxyKey, `/api/withdraw/${encodeURIComponent(orderId)}/status`);
+      const ws = String((s.data && s.data.live && s.data.live.withdrawal_status) || '').toLowerCase();
+      if (ws && !['pending', 'menunggu', 'processing'].includes(ws)) return false;
+    }
+    return true;
+  } catch (e) {
+    return true; // proxy tak terjangkau -> hormati lock
+  }
+}
+
 // --- CEK ID PLAYER via endpoint neoparty (sebelum order diteruskan ke proxy) ---
 // GET https://neo-ack.theneoparty.com/agent_recharge/order/info?player_id=X&product_id=1
 // header Signature: MD5("player_id=X&product_id=1&signature={SIG}")
@@ -170,7 +284,7 @@ module.exports = async (req, res) => {
   if (!PROXY_URL || !PROXY_KEY) {
     return res.status(500).json({
       success: false,
-      error: 'Error. Sedang dalam pemeliharaan',
+      error: 'Proxy belum dikonfigurasi (KINGARTHUR_PROXY_URL / KINGARTHUR_PROXY_KEY).',
     });
   }
 
@@ -210,6 +324,17 @@ module.exports = async (req, res) => {
           `/api/withdraw/${encodeURIComponent(orderId)}/status`);
         live = s.data && s.data.live;
       }
+      // Lock pending: lepas bila order ini sudah terminal
+      try {
+        const ws = String((live && live.withdrawal_status) || '').toLowerCase();
+        const liveTerminal = !!ws && !['pending', 'menunggu', 'processing'].includes(ws);
+        const orderTerminal = ['FAILED', 'MANUAL_VERIFICATION_REQUIRED',
+          'BROWSER_ERROR', 'SUPPLIER_ERROR'].includes(order.status);
+        if (liveTerminal || orderTerminal) {
+          const rid = await kvGet(lockOrderKey(orderId));
+          if (rid) await clearLock(rid, orderId);
+        }
+      } catch (e) { /* abaikan — jangan ganggu respon polling */ }
       return res.status(200).json({
         success: true,
         order_status: order.status,
@@ -241,6 +366,31 @@ module.exports = async (req, res) => {
   // --- BLOCKED ROYAL ID: daftar manual dari env BLOCKED_ROYAL_IDS ---
   if (BLOCKED_ROYALS.includes(royalId)) {
     return res.status(403).json({ success: false, error: 'Coba lagi nanti.' });
+  }
+
+  // --- LOCK PENDING: ID dengan bongkar pending tidak bisa bongkar lagi ---
+  const existingLock = await readLock(royalId);
+  if (existingLock) {
+    const remaining = Math.floor((existingLock.expires_at - Date.now()) / 1000);
+    if (remaining > 0 && (await orderStillPending(PROXY_URL, PROXY_KEY, existingLock.order_id))) {
+      return res.status(200).json({
+        success: false, locked: true, order_id: existingLock.order_id,
+        remaining_seconds: remaining,
+        error: 'Bongkar sebelumnya masih pending.',
+      });
+    }
+    await clearLock(royalId, existingLock.order_id);
+  }
+
+  // --- CEK SALDO KOIN: saldo harus >= nominal x 1,02 + 500M ---
+  if (BALANCE_CHECK_ENABLED) {
+    const bal = await checkCoinBalance(royalId, amount);
+    if (bal && !bal.ok) {
+      return res.status(400).json({
+        success: false, error: 'Koin bongkar kurang',
+        coin: bal.coin, required_coin: bal.required,
+      });
+    }
   }
 
   // --- CEK ID PLAYER: tolak ID yang tidak terdaftar di game ---
@@ -279,6 +429,8 @@ module.exports = async (req, res) => {
         error: (sub.data && sub.data.error) || 'Gagal membuat penarikan.',
       });
     }
+    // kunci ID ini selama ordernya pending (10 menit)
+    await writeLock(royalId, orderId);
 
     const deadline = Date.now() + POLL_BUDGET_MS;
     let order = null;
@@ -298,12 +450,14 @@ module.exports = async (req, res) => {
       return res.status(200).json({ success: true, order_id: orderId, withdrawal: sanitize(order.result) });
     }
     if (order && order.status === 'MANUAL_VERIFICATION_REQUIRED') {
+      await clearLock(royalId, orderId);
       return res.status(502).json({
         success: false, order_id: orderId,
         error: 'Coba lagi beberapa saat.',
       });
     }
     if (order && ['FAILED', 'BROWSER_ERROR', 'SUPPLIER_ERROR'].includes(order.status)) {
+      await clearLock(royalId, orderId);
       return res.status(502).json({
         success: false, order_id: orderId,
         error: order.error || 'Gagal membuat penarikan.',
@@ -316,7 +470,7 @@ module.exports = async (req, res) => {
   } catch (e) {
     return res.status(502).json({
       success: false,
-      error: 'Coba lagi beberapa saat.',
+      error: 'Coba lagi nanti.',
     });
   }
 };
