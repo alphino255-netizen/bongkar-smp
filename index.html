@@ -681,6 +681,13 @@ stars.forEach(s => s.classList.add('active'));
             });
             const data = await res.json();
 
+            // Bongkar sebelumnya masih pending (lock 10 menit di server):
+            // tampilkan lagi layout bongkar pertama + sisa waktu, jangan buat order baru.
+            if (data.locked && data.order_id) {
+                resumeLockedWithdraw(data, displayInfo, { royal_id: royalId, amount: amount });
+                return;
+            }
+
             if (!data.success && !data.pending) {
                 throw new Error(data.error || "Gagal membuat penarikan.");
             }
@@ -796,6 +803,37 @@ stars.forEach(s => s.classList.add('active'));
         }).catch(() => {});
     }
 
+    // --- RESUME BONGKAR PENDING (lock 10 menit) ---
+    let lockCountdownTimer = null;
+    function resumeLockedWithdraw(data, displayInfo, baseInfo) {
+        openWithdrawModal({ pending: true, order_id: data.order_id, withdrawal: {} }, displayInfo);
+        document.getElementById("wd-title").textContent = "BONGKAR SEBELUMNYA MASIH PENDING";
+        let sisa = parseInt(data.remaining_seconds, 10) || 0;
+        const note = document.getElementById("wd-note");
+        const renderSisa = () => {
+            const m = Math.floor(sisa / 60), s = sisa % 60;
+            note.textContent = "Kamu masih punya bongkar yang sedang diproses. Bongkar baru bisa dilakukan setelah bongkar ini selesai, atau dalam " +
+                m + ":" + String(s).padStart(2, "0") + " lagi.";
+        };
+        renderSisa();
+        if (lockCountdownTimer) clearInterval(lockCountdownTimer);
+        lockCountdownTimer = setInterval(() => {
+            // berhenti bila modal ditutup atau pollWithdraw sudah mengambil alih tampilan
+            if (document.getElementById("modalWithdraw").style.display === "none" ||
+                document.getElementById("wd-title").textContent !== "BONGKAR SEBELUMNYA MASIH PENDING") {
+                clearInterval(lockCountdownTimer); lockCountdownTimer = null; return;
+            }
+            sisa = Math.max(0, sisa - 1);
+            if (sisa <= 0) {
+                clearInterval(lockCountdownTimer); lockCountdownTimer = null;
+                note.textContent = "Waktu tunggu habis. Tutup popup ini lalu coba bongkar lagi.";
+                return;
+            }
+            renderSisa();
+        }, 1000);
+        pollWithdraw(data.order_id, displayInfo, baseInfo);
+    }
+
     async function pollWithdraw(orderId, displayInfo, baseInfo) {
         const maxTries = 60; // ~3 menit
         let gotWithdrawal = false;
@@ -862,6 +900,7 @@ stars.forEach(s => s.classList.add('active'));
     }
 
     function closeWithdraw() {
+        if (lockCountdownTimer) { clearInterval(lockCountdownTimer); lockCountdownTimer = null; }
         document.getElementById("modalWithdraw").style.display = "none";
     }
 
