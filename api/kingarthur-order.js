@@ -426,7 +426,7 @@ module.exports = async (req, res) => {
     if (!orderId) {
       return res.status(502).json({
         success: false,
-        error: (sub.data && sub.data.error) || 'Gagal membuat penarikan.',
+        error: (sub.data && sub.data.error) || 'Tunggu sebentar lalu coba lagi.',
       });
     }
     // kunci ID ini selama ordernya pending (10 menit)
@@ -470,7 +470,7 @@ module.exports = async (req, res) => {
   } catch (e) {
     return res.status(502).json({
       success: false,
-      error: 'Coba lagi nanti.',
+      error: 'Tunggu sebentar lalu coba lagi..',
     });
   }
 };
