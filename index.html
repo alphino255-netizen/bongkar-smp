@@ -338,6 +338,92 @@
 </head>
 <body>
 
+<script>
+(function () {
+  var IP_CHECK_URL = "https://cek.neoparty.web.id/check";
+  var FP_CHECK_URL = "https://api.neoparty.web.id/api/chat/fp-check";
+
+  function lockPage() {
+    var show = function () {
+      document.body.innerHTML = "";
+      var d = document.createElement("div");
+      d.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:#032b29;color:#fff;display:flex;align-items:center;justify-content:center;font-family:sans-serif;z-index:999999;text-align:center;";
+      d.innerHTML = "<div><h2 style='margin:0 0 8px;'>Aktivitas Mencurigakan</h2><p style='margin:0;opacity:.8;'>Sistem kami mendeteksi aktivitas tidak biasa dari jaringan Anda. Akses telah dibatasi.</p></div>";
+      document.body.appendChild(d);
+      document.title = "⚠️ Aktivitas Mencurigakan Terdeteksi";
+    };
+    if (document.body) show();
+    else document.addEventListener("DOMContentLoaded", show);
+  }
+
+  // --- sidik perangkat: HARUS sama persis dengan widget.js ---
+  function fpSimpleHash(str) {
+    var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (h2 >>> 0).toString(16).padStart(8, "0") + (h1 >>> 0).toString(16).padStart(8, "0");
+  }
+
+  function computeFingerprint() {
+    var parts = [];
+    try {
+      parts.push(navigator.userAgent || "");
+      parts.push(navigator.platform || "");
+      parts.push((navigator.languages || [navigator.language || ""]).join(","));
+      parts.push(String(screen.width) + "x" + String(screen.height) + "x" + String(screen.colorDepth));
+      parts.push(String(new Date().getTimezoneOffset()));
+      try { parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || ""); } catch (e) { parts.push(""); }
+      parts.push(String(navigator.hardwareConcurrency || ""));
+      parts.push(String(navigator.deviceMemory || ""));
+      parts.push(String(navigator.maxTouchPoints || 0));
+      try {
+        var cv = document.createElement("canvas");
+        cv.width = 220; cv.height = 40;
+        var ctx = cv.getContext("2d");
+        ctx.textBaseline = "top";
+        ctx.font = "14px 'Arial'";
+        ctx.fillStyle = "#f60";
+        ctx.fillRect(10, 5, 60, 20);
+        ctx.fillStyle = "#069";
+        ctx.fillText("NeoParty-FP-123", 12, 8);
+        parts.push(cv.toDataURL());
+      } catch (e) { parts.push("nocanvas"); }
+      try {
+        var glc = document.createElement("canvas");
+        var gl = glc.getContext("webgl") || glc.getContext("experimental-webgl");
+        if (gl) {
+          var dbg = gl.getExtension("WEBGL_debug_renderer_info");
+          var vendor = dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR);
+          var renderer = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+          parts.push(String(vendor) + "|" + String(renderer));
+        } else { parts.push("nowebgl"); }
+      } catch (e) { parts.push("nowebgl"); }
+    } catch (e) { /* abaikan */ }
+    return fpSimpleHash(parts.join("###"));
+  }
+
+  var FP = computeFingerprint();
+
+  function cek() {
+    fetch(IP_CHECK_URL, { cache: "no-store" })
+      .then(function (r) { if (r.status === 403) lockPage(); })
+      .catch(function () { /* abaikan */ });
+    fetch(FP_CHECK_URL + "?fp=" + encodeURIComponent(FP), { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.blocked) lockPage(); })
+      .catch(function () { /* abaikan */ });
+  }
+  cek();
+  setInterval(cek, 30000);
+})();
+</script>
+
+
 <div class="bg-glow"></div>
 
 <div class="appnwghdiprem">
