@@ -35,7 +35,9 @@
  *   Cabang Zenith memakai env SENDIRI (ZENITH_PROXY_URL / ZENITH_PROXY_KEY),
  *   proxy Zenith 500m di RDP (port 8792), dan TIDAK memakai cek saldo
  *   hidupcuan maupun cek ID neo-ack (keduanya memeriksa sistem Neo,
- *   sedangkan royal_id di sini akun Zenith). Rekening tujuan selalu dari
+ *   sedangkan royal_id di sini akun Zenith). Sejak 2026-10-27 cabang
+ *   Zenith juga TIDAK kena rate limit (pengecualian khusus 500m) —
+ *   lock pending tetap berlaku. Rekening tujuan selalu dari
  *   input user; sanitize() yang sama memastikan data rekening tidak
  *   kembali ke browser.
  *   GET ?action=health-zenith -> health proxy Zenith (health King Arthur
@@ -601,20 +603,12 @@ module.exports = async (req, res) => {
       }
       await zenithClearLock(royalId, zLock.order_id);
     }
-    // RATE LIMIT Zenith (kunci terpisah; KV fail-open seperti King Arthur)
-    if (RATE_LIMIT_ENABLED) {
-      const cdKey = `cd:zenith500m:id:${royalId}`;
-      if ((await cooldownAcquire(cdKey)) === 'exists') {
-        const ttl = await cooldownTtl(cdKey);
-        const sisa = ttl
-          ? (ttl >= 90 ? `±${Math.ceil(ttl / 60)} menit` : `${ttl} detik`)
-          : 'beberapa menit';
-        return res.status(429).json({
-          success: false,
-          error: `Terlalu cepat. ID ini baru saja membuat order — coba lagi dalam ${sisa}.`,
-        });
-      }
-    }
+    // PENGECUALIAN 2026-10-27 (permintaan fiqry): cabang Zenith 500m
+    // TIDAK kena rate limit — tidak ada blok cooldown di sini, jadi
+    // pesanan 500m tidak pernah ditolak 'Terlalu cepat'. Yang tetap
+    // berlaku hanya LOCK PENDING di atas: order yang masih pending
+    // mengembalikan order_id lama, bukan membuat order ganda.
+    // Jalur King Arthur di bawah tetap memakai rate limit seperti biasa.
     try {
       const sub = await proxyFetch(Z_URL, Z_KEY, '/bongkar/inquiry', {
         method: 'POST',
