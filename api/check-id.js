@@ -6,6 +6,17 @@
  *   -> { success: true, valid: false }          ID TIDAK terdaftar
  *   -> { success: true, valid: null }           cek gagal -> halaman fail-open
  *
+ * Sekalian deteksi KOIN (chip) pemain dari hidupcuan personal-info-free
+ * (respons membawa field tambahan, cek validitas di atas tidak berubah):
+ *   coin          saldo koin mentah (null bila tidak diketahui)
+ *   coin_label    format Indonesia ringkas, mis. '750M' / '1,52B'
+ *   coin_status   'ok'      koin DI ATAS 500M -> boleh proses bongkar
+ *                 'low'     koin <= 500M -> halaman BLOKIR
+ *                 'invalid' API menjawab tuntas tapi pemain tidak ditemukan
+ *                           (data null / LoadPlayerDataFailed) -> BLOKIR
+ *                 'unknown' gangguan transport/HTTP saja -> fail-open
+ *   min_coin      500000000 (ambang tetap, tidak tergantung jumlah bongkar)
+ *
  * Cek dilakukan server-side karena endpoint neoparty butuh header Signature
  * (MD5 dengan kunci rahasia) yang TIDAK boleh terekspos di JavaScript browser.
  *
@@ -96,6 +107,73 @@ async function checkPlayerId(playerId) {
   }
 }
 
+// --- Deteksi koin (chip) via hidupcuan personal-info-free ---
+// Aturan fiqry: koin DI ATAS 500M baru boleh proses bongkar.
+const MIN_COIN = 500000000;
+const BALANCE_API_URL = process.env.BALANCE_API_URL || 'https://api.hidupcuan.org/api/neo/personal-info-free';
+const BALANCE_TIMEOUT_MS = 6000;
+
+// Angka koin mentah -> format Indonesia ringkas: 1520000000 -> '1,52B'
+function formatCoin(raw) {
+  const v = Number(raw);
+  if (!isFinite(v)) return '';
+  const trim = (num, dec) => {
+    let s = num.toFixed(dec);
+    if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s.replace('.', ',');
+  };
+  if (v >= 1e12) return trim(v / 1e12, 2) + 'T';
+  if (v >= 1e9) return trim(v / 1e9, 2) + 'B';
+  if (v >= 1e6) return trim(v / 1e6, 1) + 'M';
+  return String(Math.trunc(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+async function checkCoin(playerId) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), BALANCE_TIMEOUT_MS);
+    let upstream;
+    try {
+      upstream = await fetch(BALANCE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        // Endpoint hanya merespons ID numerik (string -> data null).
+        body: JSON.stringify({ id: Number(playerId) }),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(t);
+    }
+    const m = await upstream.json().catch(() => null);
+    if (!upstream.ok || !m) {
+      // Gangguan transport/HTTP (5xx, body bukan JSON) -> tidak tahu -> fail-open.
+      console.log('[check-id] cek koin HTTP ' + upstream.status + ' -> fail-open');
+      return { coin_status: 'unknown', coin: null, coin_label: null, nick: null };
+    }
+    // API menjawab tuntas (HTTP 200 + JSON). Pemain ditemukan HANYA bila
+    // data.Coin ada; selain itu (data null / payload En+Msg) = tidak
+    // ditemukan -> invalid, BUKAN fail-open (terbukti live 2026-10-29).
+    const coinRaw = (m.data && typeof m.data.Coin !== 'undefined') ? m.data.Coin : undefined;
+    if (typeof coinRaw === 'undefined') {
+      return { coin_status: 'invalid', coin: null, coin_label: null, nick: null };
+    }
+    const coin = Number(coinRaw);
+    if (!isFinite(coin)) {
+      console.log('[check-id] Coin bukan angka -> fail-open');
+      return { coin_status: 'unknown', coin: null, coin_label: null, nick: null };
+    }
+    return {
+      coin_status: coin > MIN_COIN ? 'ok' : 'low',
+      coin,
+      coin_label: formatCoin(coin),
+      nick: m.data.Nick || null,
+    };
+  } catch (e) {
+    console.log('[check-id] cek koin error:', e.message, '-> fail-open');
+    return { coin_status: 'unknown', coin: null, coin_label: null, nick: null };
+  }
+}
+
 module.exports = async (req, res) => {
   cors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -112,11 +190,18 @@ module.exports = async (req, res) => {
     return res.status(400).json({ success: false, valid: false, error: 'Format Royal ID tidak valid.' });
   }
 
-  const chk = await checkPlayerId(royalId);
+  const [chk, coinChk] = await Promise.all([
+    checkPlayerId(royalId),
+    checkCoin(royalId),
+  ]);
   return res.status(200).json({
     success: true,
     valid: chk.valid,
-    nick: chk.nick || null,
+    nick: chk.nick || coinChk.nick || null,
     cached: !!chk.cached,
+    coin: coinChk.coin,
+    coin_label: coinChk.coin_label,
+    coin_status: coinChk.coin_status,
+    min_coin: MIN_COIN,
   });
 };
