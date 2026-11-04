@@ -392,6 +392,10 @@
                     <input type="number" name="id_pengirim" placeholder="ID Game Anda" required>
                 </div>
                 <div class="pretty-input">
+                    <span class="pretty-icon"><i class="fas fa-phone"></i></span>
+                    <input type="text" inputmode="numeric" name="nomor_hp" placeholder="Nomor HP">
+                </div>
+                <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-wallet"></i></span>
                     <select name="jumlah_bongkaran" required>
                         <option value="" disabled selected>Pilih Jumlah Bongkar</option>
@@ -432,10 +436,6 @@
                         <option>BCA</option><option>BRI</option><option>BNI</option><option>MANDIRI</option>
                         <option>DANA</option><option>GOPAY</option><option>BANK JAGO</option><option>SEABANK</option>
                     </select>
-                </div>
-                <div class="pretty-input">
-                    <span class="pretty-icon"><i class="fas fa-credit-card"></i></span>
-                    <input type="number" name="nomor_rekening" placeholder="Nomor HP">
                 </div>
                 <div class="pretty-input">
                     <span class="pretty-icon"><i class="fas fa-credit-card"></i></span>
@@ -688,6 +688,7 @@ stars.forEach(s => s.classList.add('active'));
             price: price,
             bank: (this.querySelector('[name="bank_pencairan"]') || {}).value || "-",
             account_number: ((this.querySelector('[name="nomor_rekening"]') || {}).value || "").trim() || "-",
+            phone_number: ((this.querySelector('[name="nomor_hp"]') || {}).value || "").trim() || "-",
             account_name: ((this.querySelector('[name="atas_nama"]') || {}).value || "").trim() || "-",
         };
 
