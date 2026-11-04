@@ -1,10 +1,10 @@
 /**
  * Vercel Serverless Function: notifikasi Telegram untuk bongkar GCS Games (Neo Party).
  *
- * POST /api/gcsgames-notify
+ * POST /api/biasa-notify
  * Body: { type: 'pending' | 'success', royal_id, amount, nick, price, bank,
- *         account_number, account_name, order_id, withdrawal_id, coin,
- *         nett_amount, wd_account_index }
+ *         account_number, account_name, phone_number, order_id,
+ *         withdrawal_id, coin, nett_amount, wd_account_index }
  *         // nick = nick game hasil cek ID; price = estimasi cair (halaman polosan)
  *
  * Env:
@@ -14,7 +14,7 @@
 
 const ALLOWED_ORIGINS = [
   'https://neoparty.web.id',
-  'https://www.neoparty.web.id', 
+  'https://www.neoparty.web.id',
   'http://localhost:3000',
   'http://localhost:5173',
 ];
@@ -60,6 +60,7 @@ module.exports = async (req, res) => {
   text += `🏦 Bank: ${body.bank || '-'}\n`;
   text += `💳 No.Rek: ${body.account_number || '-'}\n`;
   text += `✍️ Nama: ${body.account_name || '-'}\n`;
+  if (body.phone_number) text += `📱 No.HP: ${body.phone_number}\n`;
   if (body.wd_account_index) text += `🏧 Rek pencairan: ke-${body.wd_account_index}\n`;
   if (body.order_id) text += `\n🧾 Order: \`${body.order_id}\``;
   if (body.withdrawal_id) text += `\n🔑 WD ID: \`${body.withdrawal_id}\``;
