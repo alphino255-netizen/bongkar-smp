@@ -10,6 +10,11 @@
  * Env:
  *   TELEGRAM_BOT_TOKEN - token bot Telegram
  *   TELEGRAM_CHAT_ID   - chat ID tujuan notif
+ *
+ * PERBAIKAN 2026-11-13: field dari pengguna/pemain (nick, nama, dll.) sekarang
+ * di-escape untuk Markdown Telegram. Sebelumnya nick mengandung "_" (mis.
+ * NEO_3309220) membuat Telegram menolak seluruh pesan ("can't parse entities")
+ * -> fungsi menjawab 502 dan notif hilang, padahal order-nya sendiri sah.
  */
 
 const ALLOWED_ORIGINS = [
@@ -25,6 +30,17 @@ function cors(req, res) {
     ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+// Escape karakter khusus Markdown (mode legacy) pada teks bebas:
+// _ * ` [ — tanpa ini satu karakter saja bisa menggagalkan seluruh pesan.
+function esc(v) {
+  return String(v == null ? '' : v).replace(/([_*`\[])/g, '\\$1');
+}
+
+// Nilai di dalam `...` (inline code): cukup buang backtick dari nilainya.
+function escCode(v) {
+  return String(v == null ? '' : v).replace(/`/g, '');
 }
 
 module.exports = async (req, res) => {
@@ -51,19 +67,19 @@ module.exports = async (req, res) => {
   const status = type === 'success' ? 'SUKSES' : 'PENDING';
 
   let text = `${emoji} *BONGKAR NEO PARTY ${status}*\n\n`;
-  text += `🆔 ID: ${body.royal_id || '-'}\n`;
-  if (body.nick) text += `🎮 Nick: ${body.nick}\n`;
-  text += `💰 Jumlah: ${body.amount || '-'}\n`;
-  if (body.price) text += `💵 Estimasi Cair: Rp ${body.price}\n`;
-  if (body.coin) text += `🪙 Koin: ${body.coin}\n`;
-  if (body.nett_amount) text += `💵 Nominal: ${body.nett_amount}\n`;
-  text += `🏦 Bank: ${body.bank || '-'}\n`;
-  text += `💳 No.Rek: ${body.account_number || '-'}\n`;
-  text += `✍️ Nama: ${body.account_name || '-'}\n`;
-  if (body.phone_number) text += `📱 No.HP: ${body.phone_number}\n`;
-  if (body.wd_account_index) text += `🏧 Rek pencairan: ke-${body.wd_account_index}\n`;
-  if (body.order_id) text += `\n🧾 Order: \`${body.order_id}\``;
-  if (body.withdrawal_id) text += `\n🔑 WD ID: \`${body.withdrawal_id}\``;
+  text += `🆔 ID: ${esc(body.royal_id || '-')}\n`;
+  if (body.nick) text += `🎮 Nick: ${esc(body.nick)}\n`;
+  text += `💰 Jumlah: ${esc(body.amount || '-')}\n`;
+  if (body.price) text += `💵 Estimasi Cair: Rp ${esc(body.price)}\n`;
+  if (body.coin) text += `🪙 Koin: ${esc(body.coin)}\n`;
+  if (body.nett_amount) text += `💵 Nominal: ${esc(body.nett_amount)}\n`;
+  text += `🏦 Bank: ${esc(body.bank || '-')}\n`;
+  text += `💳 No.Rek: ${esc(body.account_number || '-')}\n`;
+  text += `✍️ Nama: ${esc(body.account_name || '-')}\n`;
+  if (body.phone_number) text += `📱 No.HP: ${esc(body.phone_number)}\n`;
+  if (body.wd_account_index) text += `🏧 Rek pencairan: ke-${esc(body.wd_account_index)}\n`;
+  if (body.order_id) text += `\n🧾 Order: \`${escCode(body.order_id)}\``;
+  if (body.withdrawal_id) text += `\n🔑 WD ID: \`${escCode(body.withdrawal_id)}\``;
 
   try {
     const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
