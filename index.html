@@ -1,6 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<!-- GATE BLOKIR PERANGKAT - Neo Party: perangkat yang diblokir admin di dashboard
+     tidak bisa membuka web ini (bukan cuma chat). Fingerprint dihitung dengan fungsi
+     yang SAMA PERSIS dengan widget.js supaya hash-nya cocok dengan yang tersimpan
+     di dashboard. Kalau pengecekan gagal (offline/error/timeout 3 detik), web tetap tampil. -->
+<script>
+(function () {
+  var gateStyle = document.createElement("style");
+  gateStyle.id = "np-device-gate";
+  gateStyle.textContent = "body{display:none!important}";
+  document.documentElement.appendChild(gateStyle);
+  function openGate() { var s = document.getElementById("np-device-gate"); if (s) s.remove(); }
+  function showBlocked() {
+    document.documentElement.innerHTML = '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Akses Diblokir - Neo Party</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#032b29;color:#fff;font-family:Poppins,Arial,sans-serif;text-align:center;padding:24px}h1{font-size:22px;margin:0 0 12px}.box{max-width:420px}p{opacity:.85;line-height:1.6;margin:0}</style></head><body><div class="box"><h1>Perangkat ini diblokir</h1><p>Akses ke Neo Party telah dinonaktifkan untuk perangkat ini oleh admin.</p></div></body>';
+  }
+  function fpSimpleHash(str) {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (h2 >>> 0).toString(16).padStart(8, "0") + (h1 >>> 0).toString(16).padStart(8, "0");
+  }
+
+  function computeFingerprint() {
+    const parts = [];
+    try {
+      parts.push(navigator.userAgent || "");
+      parts.push(navigator.platform || "");
+      parts.push((navigator.languages || [navigator.language || ""]).join(","));
+      parts.push(String(screen.width) + "x" + String(screen.height) + "x" + String(screen.colorDepth));
+      parts.push(String(new Date().getTimezoneOffset()));
+      try { parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || ""); } catch (e) { parts.push(""); }
+      parts.push(String(navigator.hardwareConcurrency || ""));
+      parts.push(String(navigator.deviceMemory || ""));
+      parts.push(String(navigator.maxTouchPoints || 0));
+      try {
+        const cv = document.createElement("canvas");
+        cv.width = 220; cv.height = 40;
+        const ctx = cv.getContext("2d");
+        ctx.textBaseline = "top";
+        ctx.font = "14px 'Arial'";
+        ctx.fillStyle = "#f60";
+        ctx.fillRect(10, 5, 60, 20);
+        ctx.fillStyle = "#069";
+        ctx.fillText("NeoParty-FP-123", 12, 8);
+        parts.push(cv.toDataURL());
+      } catch (e) { parts.push("nocanvas"); }
+      try {
+        const glc = document.createElement("canvas");
+        const gl = glc.getContext("webgl") || glc.getContext("experimental-webgl");
+        if (gl) {
+          const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+          const vendor = dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR);
+          const renderer = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+          parts.push(String(vendor) + "|" + String(renderer));
+        } else { parts.push("nowebgl"); }
+      } catch (e) { parts.push("nowebgl"); }
+    } catch (e) { /* abaikan */ }
+    return fpSimpleHash(parts.join("###"));
+  }
+  try {
+    var fp = computeFingerprint();
+    var done = false;
+    var timer = setTimeout(function () { if (!done) { done = true; openGate(); } }, 3000);
+    fetch("https://api.neoparty.web.id/api/chat/fp-check?fp=" + encodeURIComponent(fp), { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (done) return; done = true; clearTimeout(timer); if (d && d.blocked) { showBlocked(); } else { openGate(); } })
+      .catch(function () { if (done) return; done = true; clearTimeout(timer); openGate(); });
+  } catch (e) { openGate(); }
+})();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bongkar - Neo Party</title>
